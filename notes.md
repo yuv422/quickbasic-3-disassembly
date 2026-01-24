@@ -6,12 +6,15 @@
   * [DEF FN](#def-fn)
   * [GOSUB](#gosub)
   * [GOTO](#goto)
+  * [INP](#inp)
   * [BASIC Compiled interrupt functions](#basic-compiled-interrupt-functions)
   * [0x3d Interrupt](#0x3d-interrupt)
     * [0x1 - FIX (float)](#0x1---fix-float)
     * [0x2 - FIX (double)](#0x2---fix-double)
     * [0x5 - ?? Seen in CHR$(42) example.](#0x5----seen-in-chr42-example)
     * [0x6 - INKEY$](#0x6---inkey)
+    * [0x14 - HEX$ (integer)](#0x14---hex-integer)
+    * [0x15 - HEX$ (float)](#0x15---hex-float)
     * [0x18 - CVI](#0x18---cvi)
     * [0x19 - CVS](#0x19---cvs)
     * [0x1A - CVD](#0x1a---cvd)
@@ -63,6 +66,7 @@
     * [0x3B - STEP ??](#0x3b---step-)
     * [0x46 - ENVIRON$ (name)](#0x46---environ-name)
     * [0x47 - ENVIRON$ (ordinal)](#0x47---environ-ordinal)
+    * [0x55 - PRESET (step)](#0x55---preset-step)
     * [0x58 - PUT (graphics)](#0x58---put-graphics)
     * [0x5B - SCREEN](#0x5b---screen)
     * [0x64 - COM(n) ON](#0x64---comn-on)
@@ -75,8 +79,9 @@
     * [0x85 - LINE (end position)](#0x85---line-end-position)
     * [0x86 - LINE](#0x86---line)
     * [0x89 - PUT (position)](#0x89---put-position)
+    * [0x8A - PRESET](#0x8a---preset)
     * [0x8C - CIRCLE](#0x8c---circle)
-    * [0x8D - ?? set point (x, y)](#0x8d----set-point-x-y)
+    * [0x8D - set point (x, y)](#0x8d---set-point-x-y)
     * [0xA5 - POKE](#0xa5---poke)
   * [0x3f Interrupt](#0x3f-interrupt)
     * [0xA - RSET](#0xa---rset)
@@ -84,6 +89,7 @@
     * [0xE - READ (double)](#0xe---read-double)
     * [0xF - READ (integer)](#0xf---read-integer)
     * [0x10 - READ (string)](#0x10---read-string)
+    * [0x19 - float to int](#0x19---float-to-int)
     * [0x21 - ?? push float to stack](#0x21----push-float-to-stack)
     * [0x43 - DIM (dynamic float)](#0x43---dim-dynamic-float)
     * [0x44 - DIM (dynamic double)](#0x44---dim-dynamic-double)
@@ -99,9 +105,10 @@
     * [0x5B - LSET](#0x5b---lset)
     * [0x61 - Copy string](#0x61---copy-string)
     * [0x62 - Compare strings](#0x62---compare-strings)
+    * [0x6f - PUSH float](#0x6f---push-float)
     * [0x73 - ??](#0x73---)
     * [0x75 - CINT (float)](#0x75---cint-float)
-    * [0x75 - CINT (double)](#0x75---cint-double)
+    * [0x76 - CINT (double)](#0x76---cint-double)
     * [0x77 - pop integer off stack](#0x77---pop-integer-off-stack)
     * [0x78 - POP double as integer ??](#0x78---pop-double-as-integer-)
     * [0x79 - CSNG](#0x79---csng)
@@ -111,8 +118,15 @@
     * [0x7E - POP double](#0x7e---pop-double)
     * [0x7F - Addition (float)](#0x7f---addition-float)
     * [0x80 - Addition (double)](#0x80---addition-double)
+    * [0x87 - Division (float)](#0x87---division-float)
+    * [0x88 - Division (double)](#0x88---division-double)
+    * [0x8f - Multiplication (float)](#0x8f---multiplication-float)
+    * [0x90 - Multiplication (double)](#0x90---multiplication-double)
+    * [0x97 - Subtraction (float)](#0x97---subtraction-float)
+    * [0x98 - Subtraction (double)](#0x98---subtraction-double)
     * [0x9F - compare floats](#0x9f---compare-floats)
     * [0xA0 - compare doubles](#0xa0---compare-doubles)
+    * [0xAB - multiply float by power of 2](#0xab---multiply-float-by-power-of-2)
     * [0xB3 - ?? FIELD start maybe](#0xb3----field-start-maybe)
     * [0xB4 - FIELD var](#0xb4---field-var)
     * [0xBB - ASC](#0xbb---asc)
@@ -164,6 +178,19 @@ RETURN
 ## GOTO
 goto is converted into a `JMP` instruction
 
+## INP
+Returns a byte from a specified I/O port. `y = INP(port)`
+
+compiles down to assembly. using `IN` command
+
+eg. `a% = INP(42)` becomes
+```asm
+       1000:0040 ba  2a  00       MOV        DX ,0x2a
+       1000:0043 ec               IN         AL ,DX
+       1000:0044 30  e4           XOR        AH ,AH
+       1000:0046 a3  56  18       MOV        [0x1856 ],AX
+```
+
 ## BASIC Compiled interrupt functions
 
 Basic code is compiled into assembly with the original BASIC code converted into
@@ -207,6 +234,26 @@ Loads last keypress
 Returns:
 
     BX - pointer to string containing last keypress
+
+### 0x14 - HEX$ (integer)
+Hexadecimal Value, as String. `s$ = HEX$(numexpr)`
+Input:
+
+    BX - integer value
+
+Returns:
+
+    BX - pointer to hex string
+
+### 0x15 - HEX$ (float)
+Hexadecimal Value, as String. `s$ = HEX$(numexpr)`
+Input:
+
+    BX - pointer to float
+
+Returns:
+
+    BX - pointer to hex string
 
 ### 0x18 - CVI
 Convert String to Integer. Result stored in internal integer
@@ -568,6 +615,15 @@ Returns:
 
     BX - pointer to string containing env value.
 
+### 0x55 - PRESET (step)
+Draw Point on Screen using STEP (relative to last graphics point)
+
+Input:
+
+    BX - x - integer
+    DX - y - integer
+    CX - color
+
 ### 0x58 - PUT (graphics)
 Plot Array Image on Screen
 `PUT (x,y), array [,action]`
@@ -645,8 +701,10 @@ Position of start of the line.
 
 Input:
 
-    BX - x - integer value
-    DX - y - integer value
+    CX - xType - type of x argument. -1 = float, 0 = integer
+    AX - yType - type of y argument. -1 = float, 0 = integer
+    BX - x - value
+    DX - y - value
 
 ### 0x85 - LINE (end position)
 Position of end of the line.
@@ -676,6 +734,14 @@ Input:
     BX - x - integer value
     DX - y - integer value
 
+### 0x8A - PRESET
+Draw Point on Screen
+`PRESET [STEP] (x,y) [,color]`
+
+Input:
+
+    BX - color
+
 ### 0x8C - CIRCLE
 `CIRCLE [STEP] (x,y), radius [,[color] [,[start],[end][,aspect]]]`
 
@@ -688,10 +754,12 @@ Input:
 
     BX - radius - pointer to float
 
-### 0x8D - ?? set point (x, y)
+### 0x8D - set point (x, y)
 
 Input:
 
+    CX - xType - type of x argument. -1 = float, 0 = integer
+    AX - yType - type of y argument. -1 = float, 0 = integer
     BX - x - integer value
     DX - y - integer value
 
@@ -743,6 +811,17 @@ Read DATA item into a string
 Input:
 
     DX - pointer to destination string
+
+### 0x19 - float to int
+Convert float to int
+
+Input:
+
+    SI - pointer to float
+
+Returns:
+
+    BX - converted int value
 
 ### 0x21 - ?? push float to stack
 Push float onto stack. Seen in `DEF SEG = nnnn` where nnnn is a float
@@ -889,6 +968,13 @@ Return:
 
     BX - 0 if strings are equal, non-zero otherwise
 
+### 0x6f - PUSH float
+Push float onto stack.
+
+Input:
+
+    SI - pointer to float value
+
 ### 0x73 - ??
 Seen between 0x7B and 0x7E
 
@@ -905,7 +991,7 @@ Output:
     BX - integer value
 
 
-### 0x75 - CINT (double)
+### 0x76 - CINT (double)
 Convert double to integer
 
 Input:
@@ -986,6 +1072,54 @@ Input:
 SI - pointer to first double
 DI - pointer to second double
 
+### 0x87 - Division (float)
+Dived two floats and push result to stack
+`PUSH SI / DI`
+
+Input:
+SI - pointer to first float
+DI - pointer to second float
+
+### 0x88 - Division (double)
+Dived two doubles and push result to stack
+`PUSH SI / DI`
+
+Input:
+SI - pointer to first double
+DI - pointer to second double
+
+### 0x8f - Multiplication (float)
+Multiply two floats together and push result to stack
+`PUSH SI * DI`
+
+Input:
+SI - pointer to first float
+DI - pointer to second float
+
+### 0x90 - Multiplication (double)
+Multiply two doubles together and push result to stack
+`PUSH SI * DI`
+
+Input:
+SI - pointer to first double
+DI - pointer to second double
+
+### 0x97 - Subtraction (float)
+subtract two floats and push result to stack
+`PUSH SI - DI`
+
+Input:
+SI - pointer to first float
+DI - pointer to second float
+
+### 0x98 - Subtraction (double)
+subtract two doubles and push result to stack
+`PUSH SI - DI`
+
+Input:
+SI - pointer to first double
+DI - pointer to second double
+
 ### 0x9F - compare floats
 Compare two floats and set x86 flags accordingly
 eg.
@@ -1009,6 +1143,22 @@ Input:
 
 SI - left hand double pointer
 DI - right hand double pointer
+
+### 0xAB - multiply float by power of 2
+Multiply float by power of 2 (2 byte command) push resulting float to stack
+
+eg. multiply float at 0x185a by 8.
+```asm
+       1000:0087 8b  f2           MOV        SI ,0x185a
+       1000:0089 cd  3f           INT        0x3f
+       1000:008b ab              db         ABh
+       1000:008c 04              ??         03h
+```
+
+Input:
+
+    SI - pointer to float to multiply
+    Second command byte - number of power to multiply by. eg 3 for 2^3 multiply by 8
 
 ### 0xB3 - ?? FIELD start maybe
 
