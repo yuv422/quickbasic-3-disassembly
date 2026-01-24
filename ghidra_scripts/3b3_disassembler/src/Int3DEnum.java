@@ -5,7 +5,7 @@ public enum Int3DEnum {
     INT_3D_4_UNK(0x4),
     INT_3D_5_UNK(0x5),
     INT_3D_6_INKEY$(0x6),
-    INT_3D_7_UNK(0x7),
+    INT_3D_7_INPUT$(0x7),
     INT_3D_8_UNK(0x8),
     INT_3D_9_UNK(0x9),
     INT_3D_A_UNK(0xa),

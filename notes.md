@@ -55,6 +55,7 @@
     * [0x20 - ?? seen in OPEN test](#0x20----seen-in-open-test)
     * [0x21 - CLOSE](#0x21---close)
     * [0x22 - CLOSE (close all open files)](#0x22---close-close-all-open-files)
+    * [0x24 - KILL](#0x24---kill)
     * [0x25 - GET (default)](#0x25---get-default)
     * [0x26 - GET](#0x26---get)
     * [0x28 - PUT (File IO)](#0x28---put-file-io)
@@ -129,6 +130,10 @@
     * [0xAB - multiply float by power of 2](#0xab---multiply-float-by-power-of-2)
     * [0xB3 - ?? FIELD start maybe](#0xb3----field-start-maybe)
     * [0xB4 - FIELD var](#0xb4---field-var)
+    * [0xB5 - INPUT from keyboard](#0xb5---input-from-keyboard)
+    * [0xB6 - INPUT file/device](#0xb6---input-filedevice)
+    * [0xB7 - INPUT arguments](#0xb7---input-arguments)
+    * [0xB8 - INPUT load variable value](#0xb8---input-load-variable-value)
     * [0xBB - ASC](#0xbb---asc)
 <!-- TOC -->
 
@@ -234,6 +239,15 @@ Loads last keypress
 Returns:
 
     BX - pointer to string containing last keypress
+
+### 0x7 - INPUT$
+Read Specified Number of Characters
+`INPUT$(n [,[#]filenum])`
+
+Input:
+
+    BX - number of characters to read
+    DX - filename - or 0x7fff when filenum not supplied. In this case it reads from keyboard.
 
 ### 0x14 - HEX$ (integer)
 Hexadecimal Value, as String. `s$ = HEX$(numexpr)`
@@ -422,6 +436,14 @@ Terminate Program
 ### 0x2 - (END PROGRAM)
 Found at the end of the program. Clean up and exit to DOS
 
+### 0x7 - WRITE to device start
+Start writing to file.
+eg `WRITE #2, name$`
+
+Input:
+
+    BX - filenum
+
 ### 0xB - CLEAR
 Close Files, Reset Variables, Set Stack Space
 
@@ -531,6 +553,13 @@ Input:
 
 ### 0x22 - CLOSE (close all open files)
 Close File or Device
+
+### 0x24 - KILL
+delete file
+
+Input:
+
+    BX - pointer to string containing filename
 
 ### 0x25 - GET (default)
 Read Random File into Buffer
@@ -968,7 +997,7 @@ Return:
 
     BX - 0 if strings are equal, non-zero otherwise
 
-### 0x6f - PUSH float
+### 0x6F - PUSH float
 Push float onto stack.
 
 Input:
@@ -1174,6 +1203,51 @@ Input:
     BX - pointer to field string 
     DX - fieldWidth - integer
 
+### 0xB5 - INPUT from keyboard
+read input from file or device (2 byte command)
+`INPUT[;]["prompt" {; | ,}] variable [,variable]...`
+
+Input:
+
+    BX - pointer to prompt string
+    second byte - unknown. *TODO*
+
+### 0xB6 - INPUT file/device
+Read input data from file/device
+
+Input:
+
+    BX - filenum
+
+### 0xB7 - INPUT arguments
+Seems to setup number and type of arguments
+Variable length command bytes
+
+Input: 
+
+    first extra byte - number of arguments
+    variable number of additional bytes - type of argument. 4 = string 2 = float
+
+### 0xB8 - INPUT load variable value
+Loads the parsed value into variable
+
+Input:
+
+    BX - pointer to target variable
+
+### 0xBC - print to screen start
+Seems to be set when printing data to screen.
+
+eg.
+```asm
+       1000:009e cd  3f           INT        0x3f
+       1000:00a0 bc              db         BCh           I3F_BC_PRINT_TO_SCREEN_START
+       1000:00a1 8b  da           MOV        BX ,DX
+       1000:00a3 cd  3f           INT        0x3f
+       1000:00a5 6e              db         6Eh           I3F_6E_UNK
+       1000:00a6 cd  3e           INT        0x3e
+       1000:00a8 79              db         79h           INT_3E_79_PRINT
+```
 ### 0xBB - ASC
 Returns the ASCII value of the first character of a string expression.
 string passed in BX

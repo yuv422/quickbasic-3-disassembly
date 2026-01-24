@@ -6,6 +6,7 @@ import ghidra.program.model.address.AddressSet;
 import ghidra.program.model.data.DataType;
 import ghidra.program.model.listing.CommentType;
 import ghidra.program.model.listing.Instruction;
+import ghidra.program.model.mem.MemoryAccessException;
 import ghidra.program.model.scalar.Scalar;
 import ghidra.util.task.ConsoleTaskMonitor;
 
@@ -50,7 +51,7 @@ public class QuickBasic3Disassembler extends GhidraScript {
                                 getCommandString(intCode, commandByte),
                                 CommentType.EOL);
 
-                    nextAddress = nextAddress.add(getNumCommandBytes(intCode, commandByte)); // skip command byte
+                    nextAddress = nextAddress.add(getNumCommandBytes(intCode, commandByte, nextAddress)); // skip command byte
                     if (intCode == 0x3e && commandByte == 2) {
                         endReached = true;
                     }
@@ -59,11 +60,17 @@ public class QuickBasic3Disassembler extends GhidraScript {
         }
     }
 
-    int getNumCommandBytes(int intCode, int commandByte) {
+    int getNumCommandBytes(int intCode, int commandByte, Address commandByteAddress) throws MemoryAccessException {
         switch (intCode) {
             case 0x3d : return Int3DEnum.findByCmd(commandByte).cmdLength;
             case 0x3e : return 1; //Int3EEnum.findByCmd(commandByte).cmdLength;
-            case 0x3f : return Int3FEnum.findByCmd(commandByte).cmdLength;
+            case 0x3f : {
+                if (commandByte == 0xb7) {
+                    int numArgs = Byte.toUnsignedInt(currentProgram.getMemory().getByte(commandByteAddress.add(1)));
+                    return numArgs + 2;
+                }
+                return Int3FEnum.findByCmd(commandByte).cmdLength;
+            }
         }
         return 1;
     }
