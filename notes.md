@@ -13,6 +13,7 @@
     * [0x2 - FIX (double)](#0x2---fix-double)
     * [0x5 - ?? Seen in CHR$(42) example.](#0x5----seen-in-chr42-example)
     * [0x6 - INKEY$](#0x6---inkey)
+    * [0x7 - INPUT$](#0x7---input)
     * [0x14 - HEX$ (integer)](#0x14---hex-integer)
     * [0x15 - HEX$ (float)](#0x15---hex-float)
     * [0x18 - CVI](#0x18---cvi)
@@ -39,6 +40,7 @@
   * [0x3e Interrupt](#0x3e-interrupt)
     * [0x1 - END](#0x1---end)
     * [0x2 - (END PROGRAM)](#0x2---end-program)
+    * [0x7 - WRITE to device start](#0x7---write-to-device-start)
     * [0xB - CLEAR](#0xb---clear)
     * [0xC - CLEAR (no stack args)](#0xc---clear-no-stack-args)
     * [0xE - CHAIN](#0xe---chain)
@@ -106,7 +108,7 @@
     * [0x5B - LSET](#0x5b---lset)
     * [0x61 - Copy string](#0x61---copy-string)
     * [0x62 - Compare strings](#0x62---compare-strings)
-    * [0x6f - PUSH float](#0x6f---push-float)
+    * [0x6F - PUSH float](#0x6f---push-float)
     * [0x73 - ??](#0x73---)
     * [0x75 - CINT (float)](#0x75---cint-float)
     * [0x76 - CINT (double)](#0x76---cint-double)
@@ -134,6 +136,7 @@
     * [0xB6 - INPUT file/device](#0xb6---input-filedevice)
     * [0xB7 - INPUT arguments](#0xb7---input-arguments)
     * [0xB8 - INPUT load variable value](#0xb8---input-load-variable-value)
+    * [0xBC - print to screen start](#0xbc---print-to-screen-start)
     * [0xBB - ASC](#0xbb---asc)
 <!-- TOC -->
 
