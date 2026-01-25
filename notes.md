@@ -11,9 +11,10 @@
   * [0x3d Interrupt](#0x3d-interrupt)
     * [0x1 - FIX (float)](#0x1---fix-float)
     * [0x2 - FIX (double)](#0x2---fix-double)
-    * [0x5 - ?? Seen in CHR$(42) example.](#0x5----seen-in-chr42-example)
+    * [0x5 - CHR$](#0x5---chr)
     * [0x6 - INKEY$](#0x6---inkey)
     * [0x7 - INPUT$](#0x7---input)
+    * [0x9 - INSTR](#0x9---instr)
     * [0x14 - HEX$ (integer)](#0x14---hex-integer)
     * [0x15 - HEX$ (float)](#0x15---hex-float)
     * [0x18 - CVI](#0x18---cvi)
@@ -31,6 +32,7 @@
     * [0x37 - EXP](#0x37---exp)
     * [0x3D - COS (double)](#0x3d---cos-double)
     * [0x3E - EXP (double)](#0x3e---exp-double)
+    * [0x45 - IOCTL$](#0x45---ioctl)
     * [0x48 - ERDEV](#0x48---erdev)
     * [0x49 - ERDEV$](#0x49---erdev)
     * [0x4A - COMMAND$](#0x4a---command)
@@ -67,6 +69,8 @@
     * [0x35 - COLOR](#0x35---color)
     * [0x36 - DRAW](#0x36---draw)
     * [0x3B - STEP ??](#0x3b---step-)
+    * [0x3C - KEY on/off/list](#0x3c---key-onofflist)
+    * [0x3D - KEY](#0x3d---key)
     * [0x46 - ENVIRON$ (name)](#0x46---environ-name)
     * [0x47 - ENVIRON$ (ordinal)](#0x47---environ-ordinal)
     * [0x55 - PRESET (step)](#0x55---preset-step)
@@ -75,7 +79,11 @@
     * [0x64 - COM(n) ON](#0x64---comn-on)
     * [0x65 - COM(n) OFF](#0x65---comn-off)
     * [0x66 - COM(n) STOP](#0x66---comn-stop)
+    * [0x67 - KEY(n) ON](#0x67---keyn-on)
+    * [0x68 - KEY(n) OFF](#0x68---keyn-off)
+    * [0x69 - KEY(n) STOP](#0x69---keyn-stop)
     * [0x79 - PRINT](#0x79---print)
+    * [0x7D - IOCTL](#0x7d---ioctl)
     * [0x7E - ENVIRON](#0x7e---environ)
     * [0x7F - CHDIR](#0x7f---chdir)
     * [0x84 - LINE (start position)](#0x84---line-start-position)
@@ -87,6 +95,7 @@
     * [0x8D - set point (x, y)](#0x8d---set-point-x-y)
     * [0xA5 - POKE](#0xa5---poke)
   * [0x3f Interrupt](#0x3f-interrupt)
+    * [0x4 - ON KEY trap](#0x4---on-key-trap)
     * [0xA - RSET](#0xa---rset)
     * [0xD - READ (float)](#0xd---read-float)
     * [0xE - READ (double)](#0xe---read-double)
@@ -106,6 +115,7 @@
     * [0x56 - ?? used in b# = CDBL(a%)](#0x56----used-in-b--cdbla)
     * [0x57 - push integer to stack](#0x57---push-integer-to-stack)
     * [0x5B - LSET](#0x5b---lset)
+    * [0x60 - RETURN](#0x60---return)
     * [0x61 - Copy string](#0x61---copy-string)
     * [0x62 - Compare strings](#0x62---compare-strings)
     * [0x6F - PUSH float](#0x6f---push-float)
@@ -233,8 +243,17 @@ Input:
 
     BX - pointer to double value
 
-### 0x5 - ?? Seen in CHR$(42) example.
-BX contains the integer value
+### 0x5 - CHR$
+Convert ASCII Code to Character
+`s$ = CHR$(code)`
+
+Input:
+
+    BX - contains the integer value
+
+Return:
+
+    BX - string - pointer to string representation of code
 
 ### 0x6 - INKEY$
 Loads last keypress
@@ -251,6 +270,21 @@ Input:
 
     BX - number of characters to read
     DX - filename - or 0x7fff when filenum not supplied. In this case it reads from keyboard.
+
+### 0x9 - INSTR
+`INSTR(stringexp1,stringexp2)`
+
+Returns the character position within a string at which a substring is
+found.
+
+Input:
+
+    BX - stringexp1 - string to search
+    DX - stringexp2 - substring to match
+
+Return:
+
+    BX - integer value of offset. 1 based. 0 = no match
 
 ### 0x14 - HEX$ (integer)
 Hexadecimal Value, as String. `s$ = HEX$(numexpr)`
@@ -378,6 +412,17 @@ Pushes result to stack
 Input:
 
     BX - numexpr - pointer to double
+### 0x45 - IOCTL$
+Read Control String from Device Driver
+`s$ = IOCTL$([#]filenum)`
+
+Input:
+
+    BX - filenum - integer value
+
+Return:
+
+    BX - string - pointer to control string
 
 ### 0x48 - ERDEV
 Critical Error Code
@@ -623,6 +668,22 @@ Input:
 ### 0x3B - STEP ??
 Seems to indicate the STEP instruction in a line statement.
 
+### 0x3C - KEY on/off/list
+Display soft keys on bottom of screen. Or as list
+
+Input:
+
+    BX - command - integer value. 0 = OFF, 1 = ON, 2 = LIST
+
+### 0x3D - KEY
+Set soft Keys
+`KEY n, strexpr`
+
+Input:
+
+    BX - n - integer value (1 - 10)
+    DX - strexpr - pointer to string
+
 ### 0x46 - ENVIRON$ (name)
 Fetch value from system environment table. 
 eg. `path$ = ENVIRON$("PATH")`
@@ -699,6 +760,30 @@ Input:
 
     BX - com port number - integer value
 
+### 0x67 - KEY(n) ON
+Enable key trap
+`KEY(n) ON`
+
+Input:
+
+    BX - n - key to trap (1 - 20)
+
+### 0x68 - KEY(n) OFF
+Enable key trap
+`KEY(n) OFF`
+
+Input:
+
+    BX - n - key to trap (1 - 20)
+
+### 0x69 - KEY(n) STOP
+Enable key trap
+`KEY(n) STOP`
+
+Input:
+
+    BX - n - key to trap (1 - 20)
+
 ### 0x79 - PRINT
 Displays one or more numeric or string expressions on screen.
 
@@ -712,6 +797,15 @@ load expressions with INT 0x3f calls
 INT 0x3e
 0x79
 ```
+
+### 0x7D - IOCTL
+Send Control String to Device Driver
+`IOCTL[#]filenum,stringexpr`
+
+Input:
+
+    BX - filenum
+    DX - pointer to stringexpr
 
 ### 0x7E - ENVIRON
 Set environment variable
@@ -807,6 +901,15 @@ Input:
 ## 0x3f Interrupt
 
 Seems to be used for variables
+
+### 0x4 - ON KEY trap
+Trap for keypress
+`ON KEY(n) GOSUB {linenum | linelabel}`
+
+Input:
+
+    BX - n - key number (1 to 20)
+    DX - lineNum | line label - Not sure how this is calculated yet. *TODO*
 
 ### 0xA - RSET
 Move string into random access FIELD variable. Right justified.
@@ -979,6 +1082,9 @@ Input:
 
     BX - RHS pointer to source string
     DX - LHS pointer to field string
+
+### 0x60 - RETURN
+RETURN from gosub
 
 ### 0x61 - Copy string
 Copy string from one var to another
