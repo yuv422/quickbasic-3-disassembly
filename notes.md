@@ -15,6 +15,14 @@
     * [0x6 - INKEY$](#0x6---inkey)
     * [0x7 - INPUT$](#0x7---input)
     * [0x9 - INSTR](#0x9---instr)
+    * [0xA - MID$](#0xa---mid)
+    * [0xB - LEFT$](#0xb---left)
+    * [0xC - RIGHT$](#0xc---right)
+    * [0xD - SPACE$](#0xd---space)
+    * [0xE - STRING$ (m.n)](#0xe---string-mn)
+    * [0xF - STRING$ (m,string)](#0xf---string-mstring)
+    * [0x11 - STR$](#0x11---str)
+    * [0x13 - VAL](#0x13---val)
     * [0x14 - HEX$ (integer)](#0x14---hex-integer)
     * [0x15 - HEX$ (float)](#0x15---hex-float)
     * [0x18 - CVI](#0x18---cvi)
@@ -25,13 +33,22 @@
     * [0x1D - MKD$](#0x1d---mkd)
     * [0x1E - ERL](#0x1e---erl)
     * [0x1F - ERR](#0x1f---err)
+    * [0x20 - LPOS](#0x20---lpos)
     * [0x23 - DATE$](#0x23---date)
     * [0x25 - CSRLIN](#0x25---csrlin)
+    * [0x27 - POINT (x, y)](#0x27---point-x-y)
+    * [0x2A - POINT value](#0x2a---point-value)
     * [0x2F - EOF](#0x2f---eof)
+    * [0x30 - LOC](#0x30---loc)
+    * [0x31 - LOF](#0x31---lof)
+    * [0x32 - VARPTR file](#0x32---varptr-file)
+    * [0x33 - RND(n)](#0x33---rndn)
+    * [0x34 - RND](#0x34---rnd)
     * [0x36 - COS](#0x36---cos)
     * [0x37 - EXP](#0x37---exp)
     * [0x3D - COS (double)](#0x3d---cos-double)
     * [0x3E - EXP (double)](#0x3e---exp-double)
+    * [0x43 - TIMER](#0x43---timer)
     * [0x45 - IOCTL$](#0x45---ioctl)
     * [0x48 - ERDEV](#0x48---erdev)
     * [0x49 - ERDEV$](#0x49---erdev)
@@ -39,14 +56,18 @@
     * [0x62 - PEEK](#0x62---peek)
     * [0x63 - FRE (string)](#0x63---fre-string)
     * [0x64 - FRE (num)](#0x64---fre-num)
+    * [0x65 - SADD](#0x65---sadd)
   * [0x3e Interrupt](#0x3e-interrupt)
     * [0x1 - END](#0x1---end)
     * [0x2 - (END PROGRAM)](#0x2---end-program)
     * [0x7 - WRITE to device start](#0x7---write-to-device-start)
+    * [0x8 - RANDOMIZE (no args)](#0x8---randomize-no-args)
+    * [0x9 - RANDOMIZE](#0x9---randomize)
     * [0xB - CLEAR](#0xb---clear)
     * [0xC - CLEAR (no stack args)](#0xc---clear-no-stack-args)
     * [0xE - CHAIN](#0xe---chain)
     * [0x11 - ERROR](#0x11---error)
+    * [0x13 - RESUME](#0x13---resume)
     * [0x14 - DEF SEG (default)](#0x14---def-seg-default)
     * [0x15 - DEF SEG](#0x15---def-seg)
     * [0x17 - DATE$ (write)](#0x17---date-write)
@@ -71,9 +92,12 @@
     * [0x3B - STEP ??](#0x3b---step-)
     * [0x3C - KEY on/off/list](#0x3c---key-onofflist)
     * [0x3D - KEY](#0x3d---key)
+    * [0x42 - LOCATE arg](#0x42---locate-arg)
+    * [0x44 - LOCATE](#0x44---locate)
     * [0x46 - ENVIRON$ (name)](#0x46---environ-name)
     * [0x47 - ENVIRON$ (ordinal)](#0x47---environ-ordinal)
     * [0x55 - PRESET (step)](#0x55---preset-step)
+    * [0x56 - PSET](#0x56---pset)
     * [0x58 - PUT (graphics)](#0x58---put-graphics)
     * [0x5B - SCREEN](#0x5b---screen)
     * [0x64 - COM(n) ON](#0x64---comn-on)
@@ -95,42 +119,63 @@
     * [0x8D - set point (x, y)](#0x8d---set-point-x-y)
     * [0xA5 - POKE](#0xa5---poke)
   * [0x3f Interrupt](#0x3f-interrupt)
+    * [0x2 - ON ERROR trap](#0x2---on-error-trap)
     * [0x4 - ON KEY trap](#0x4---on-key-trap)
+    * [0x9 - RESUME label](#0x9---resume-label)
     * [0xA - RSET](#0xa---rset)
     * [0xD - READ (float)](#0xd---read-float)
     * [0xE - READ (double)](#0xe---read-double)
     * [0xF - READ (integer)](#0xf---read-integer)
     * [0x10 - READ (string)](#0x10---read-string)
+    * [0x15 - VARPTR$](#0x15---varptr)
     * [0x19 - float to int](#0x19---float-to-int)
     * [0x21 - ?? push float to stack](#0x21----push-float-to-stack)
+    * [0x23 - Exponentiation Operator (float)](#0x23---exponentiation-operator-float)
+    * [0x24 - Exponentiation Operator (double)](#0x24---exponentiation-operator-double)
+    * [0x2F - SGN (float)](#0x2f---sgn-float)
+    * [0x30 - SGN (double)](#0x30---sgn-double)
     * [0x43 - DIM (dynamic float)](#0x43---dim-dynamic-float)
     * [0x44 - DIM (dynamic double)](#0x44---dim-dynamic-double)
     * [0x45 - DIM (dynamic integer)](#0x45---dim-dynamic-integer)
     * [0x46 - DIM (dynamic string)](#0x46---dim-dynamic-string)
-    * [0x47 - ERASE (dynamic)](#0x47---erase-dynamic)
-    * [0x4B - ERASE (static)](#0x4b---erase-static)
+    * [0x47 - ERASE float (dynamic)](#0x47---erase-float-dynamic)
+    * [0x48 - ERASE double (dynamic)](#0x48---erase-double-dynamic)
+    * [0x49 - ERASE int (dynamic)](#0x49---erase-int-dynamic)
+    * [0x4A - ERASE str (dynamic)](#0x4a---erase-str-dynamic)
+    * [0x4B - ERASE float (static)](#0x4b---erase-float-static)
+    * [0x4C - ERASE double (static)](#0x4c---erase-double-static)
+    * [0x4D - ERASE int (static)](#0x4d---erase-int-static)
+    * [0x4E - ERASE str (static)](#0x4e---erase-str-static)
+    * [0x4F - REDIM (float)](#0x4f---redim-float)
+    * [0x50 - REDIM (double)](#0x50---redim-double)
+    * [0x51 - REDIM (int)](#0x51---redim-int)
+    * [0x52 - REDIM (string)](#0x52---redim-string)
     * [0x53 - ?? start subroutine](#0x53----start-subroutine)
     * [0x54 - ?? end subroutine](#0x54----end-subroutine)
     * [0x55 - concatenate strings](#0x55---concatenate-strings)
     * [0x56 - ?? used in b# = CDBL(a%)](#0x56----used-in-b--cdbla)
-    * [0x57 - push integer to stack](#0x57---push-integer-to-stack)
+    * [0x57 - store int as float in temp var](#0x57---store-int-as-float-in-temp-var)
     * [0x5B - LSET](#0x5b---lset)
+    * [0x5C - MID$ statement](#0x5c---mid-statement)
     * [0x60 - RETURN](#0x60---return)
     * [0x61 - Copy string](#0x61---copy-string)
     * [0x62 - Compare strings](#0x62---compare-strings)
     * [0x6F - PUSH float](#0x6f---push-float)
-    * [0x73 - ??](#0x73---)
+    * [0x73 - store float as double in temp var](#0x73---store-float-as-double-in-temp-var)
     * [0x75 - CINT (float)](#0x75---cint-float)
     * [0x76 - CINT (double)](#0x76---cint-double)
     * [0x77 - pop integer off stack](#0x77---pop-integer-off-stack)
     * [0x78 - POP double as integer ??](#0x78---pop-double-as-integer-)
     * [0x79 - CSNG](#0x79---csng)
+    * [0x7A - convert temp vart from double to float](#0x7a---convert-temp-vart-from-double-to-float)
     * [0x7B - Copy float from one var to another](#0x7b---copy-float-from-one-var-to-another)
     * [0x7C - Copy double from one var to another](#0x7c---copy-double-from-one-var-to-another)
     * [0x7D - POP float](#0x7d---pop-float)
     * [0x7E - POP double](#0x7e---pop-double)
     * [0x7F - Addition (float)](#0x7f---addition-float)
     * [0x80 - Addition (double)](#0x80---addition-double)
+    * [0x81 - Addition temp var + (float)](#0x81---addition-temp-var--float)
+    * [0x82 - Addition temp var + (double)](#0x82---addition-temp-var--double)
     * [0x87 - Division (float)](#0x87---division-float)
     * [0x88 - Division (double)](#0x88---division-double)
     * [0x8f - Multiplication (float)](#0x8f---multiplication-float)
@@ -139,13 +184,19 @@
     * [0x98 - Subtraction (double)](#0x98---subtraction-double)
     * [0x9F - compare floats](#0x9f---compare-floats)
     * [0xA0 - compare doubles](#0xa0---compare-doubles)
+    * [0xA1 - compare float to temp var](#0xa1---compare-float-to-temp-var)
+    * [0xA2 - compare double to temp var](#0xa2---compare-double-to-temp-var)
+    * [0xA5 - ???? seems to be comparing temp var and float??](#0xa5----seems-to-be-comparing-temp-var-and-float)
     * [0xAB - multiply float by power of 2](#0xab---multiply-float-by-power-of-2)
+    * [0xAF - float negation](#0xaf---float-negation)
+    * [0x80 - double negation](#0x80---double-negation)
     * [0xB3 - ?? FIELD start maybe](#0xb3----field-start-maybe)
     * [0xB4 - FIELD var](#0xb4---field-var)
     * [0xB5 - INPUT from keyboard](#0xb5---input-from-keyboard)
     * [0xB6 - INPUT file/device](#0xb6---input-filedevice)
     * [0xB7 - INPUT arguments](#0xb7---input-arguments)
     * [0xB8 - INPUT load variable value](#0xb8---input-load-variable-value)
+    * [0xBA - LEN](#0xba---len)
     * [0xBC - print to screen start](#0xbc---print-to-screen-start)
     * [0xBB - ASC](#0xbb---asc)
 <!-- TOC -->
@@ -286,6 +337,90 @@ Return:
 
     BX - integer value of offset. 1 based. 0 = no match
 
+### 0xA - MID$
+Substring in Middle
+`s$ = MID$(stringexpr,n[,length])`
+
+Input:
+
+    BX - stringexpr - pointer to string
+    CX - length - integer value length = 0x7ffff when not supplied
+    DX - n - integer value. Offset in string to start copying from.
+
+### 0xB - LEFT$
+Substring at Left. Left most n chars.
+`s$ = LEFT$(stringexpr,n)`
+
+Input:
+
+    BX - stringexpr - pointer to string
+    DX - n - integer value
+
+### 0xC - RIGHT$
+Substring at Right. Right most n chars.
+`s$ = RIGHT$(stringexpr,n)`
+
+Input:
+
+    BX - stringexpr - pointer to string
+    DX - n - integer value
+
+### 0xD - SPACE$
+String of n Spaces
+`s$ = SPACE$(n)`
+
+Input:
+
+    BX - n - number of spaces - integer value
+
+Return:
+
+    BX - pointer to output string
+
+### 0xE - STRING$ (m.n)
+String of Specified Length and Character
+`s$ = STRING$(m,n)`
+
+Input:
+
+    BX - m - length of string
+    DX - n - char to repeat to make the string. (0 - 255)
+
+Return:
+
+    BX - string - pointer to string
+
+### 0xF - STRING$ (m,string)
+String of Specified Length and Character
+`newStr$ = STRING$(m,s$)`
+
+Input:
+
+    BX - m - length of string
+    DX - s - string pointer to string. First char is repeated into the new string
+
+Return:
+
+    BX - string - pointer to string
+
+### 0x11 - STR$
+String Representation of Numeric Expression
+
+Input:
+
+    BX - float - pointer to float
+
+Return:
+
+    BX - pointer to string
+
+### 0x13 - VAL
+convert string into double. result stored as double temp var
+
+Input:
+
+    BX - string - pointer to input string
+
 ### 0x14 - HEX$ (integer)
 Hexadecimal Value, as String. `s$ = HEX$(numexpr)`
 Input:
@@ -359,6 +494,17 @@ Returns the error number of the most recent runtime error.
 Results:
 
     BX - errorNumber - integer
+### 0x20 - LPOS
+get position of print head.
+`a = LPOS(1)`
+
+Input:
+
+    BX - n - number of printer - integer value
+
+Return:
+
+    BX - position integer value
 
 ### 0x23 - DATE$
 Loads system date into internal string. Date is in the format "MM-DD-YYYY"
@@ -369,6 +515,33 @@ Line Position of Cursor.
 Return:
 
     BX - linPos - integer value
+
+### 0x27 - POINT (x, y)
+Get Attribute for point on screen
+
+Input:
+
+    BX - x - integer value
+    DX - y - integer value
+
+Return:
+
+    BX - attribute - integer value
+
+### 0x2A - POINT value
+Get value at screen location. Stored as a float in temp var.
+
+
+Input:
+
+    BX - n - integer value
+        n = 0 the current physical x coordinate.
+        n = 1 the current physical y coordinate.
+        n = 2 the current world x coordinate, if WINDOW is
+              active; otherwise, the current physical x coordinate.
+        n = 3 the current world y coordinate, if WINDOW is
+              active; otherwise, the current physical y coordinate.
+    DX - unknown - seems to be set to the integer value 0x7fff
 
 ### 0x2F - EOF
 Checks for end of file.
@@ -382,6 +555,45 @@ Returns:
 
     BX - status - integer containing status. EOF returns -1
                 (true); otherwise, it returns 0 (false).
+
+### 0x30 - LOC
+Return current position in file. Puts position in double temp var
+
+Input:
+
+    BX - filenum - integer value
+
+### 0x31 - LOF
+Return length of file. Puts length in double temp var.
+
+Input:
+
+    BX - filenum - integer value
+
+### 0x32 - VARPTR file
+Returns the address of the file handle in memory
+`a = VARPTR(#1)`
+
+Input:
+
+    BX - filenum - integer value
+
+Return:
+
+    BX - address - integer value
+
+### 0x33 - RND(n)
+Return random number into temp var as float
+
+Input:
+
+    BX - n - pointer to float value
+        If n > 0 - next value in sequence
+           n = 0 - last value in sequence
+           n < 0 - use n to re-seed generator and return first new value in sequence
+
+### 0x34 - RND
+Return next random number into temp var as float
 
 ### 0x36 - COS
 Calculate cosine and store internally
@@ -412,6 +624,10 @@ Pushes result to stack
 Input:
 
     BX - numexpr - pointer to double
+
+### 0x43 - TIMER
+Loads number of seconds since midnight into temp var DS:1A as integer value
+
 ### 0x45 - IOCTL$
 Read Control String from Device Driver
 `s$ = IOCTL$([#]filenum)`
@@ -473,6 +689,14 @@ Input:
                 the housecleaning step and reports the amount of free
                 space available.
 
+### 0x65 - SADD
+Returns the address of a string expression. Set as integer in temp var
+`SADD(strexpr)`
+
+Input:
+
+    BX - strexpr - pointer to string
+
 ----
 0x3e Interrupt
 ----
@@ -491,6 +715,17 @@ eg `WRITE #2, name$`
 Input:
 
     BX - filenum
+
+### 0x8 - RANDOMIZE (no args)
+Prompt the user to enter a random number to seed the RND function
+
+### 0x9 - RANDOMIZE
+Seed random number generator with seed value
+`RANDOMIZE 42`
+
+Input:
+
+    BX - seed - integer value
 
 ### 0xB - CLEAR
 Close Files, Reset Variables, Set Stack Space
@@ -518,6 +753,9 @@ Force Error
 Input:
 
     BX - errorCode - integer containing error code
+
+### 0x13 - RESUME
+Resume on next instruction after error line.
 
 ### 0x14 - DEF SEG (default)
 returns the DEF SEG address to default value (`DS`).
@@ -684,6 +922,20 @@ Input:
     BX - n - integer value (1 - 10)
     DX - strexpr - pointer to string
 
+### 0x42 - LOCATE arg
+Supply an argument to locate command
+
+Input:
+
+    BX - arg - integer value
+
+### 0x44 - LOCATE
+LOCATE command. This also contains the last command argument
+
+Input:
+
+    BX - arg - integer value
+
 ### 0x46 - ENVIRON$ (name)
 Fetch value from system environment table. 
 eg. `path$ = ENVIRON$("PATH")`
@@ -717,6 +969,16 @@ Input:
     DX - y - integer
     CX - color
 
+### 0x56 - PSET
+Draw point on screen
+`PSET [STEP] (x,y) [,color]`
+
+Input:
+
+    BX - x - integer
+    DX - y - integer
+    CX - color, 0xffff for default color
+    
 ### 0x58 - PUT (graphics)
 Plot Array Image on Screen
 `PUT (x,y), array [,action]`
@@ -902,6 +1164,14 @@ Input:
 
 Seems to be used for variables
 
+### 0x2 - ON ERROR trap
+Enable Error Trapping
+`ON ERROR GOTO {linenum | linelabel}`
+
+Input:
+
+    DX - jumpTargetAddr - offset to jump to in current segment. eg. CS:jumpTargetAddr
+
 ### 0x4 - ON KEY trap
 Trap for keypress
 `ON KEY(n) GOSUB {linenum | linelabel}`
@@ -910,6 +1180,13 @@ Input:
 
     BX - n - key number (1 to 20)
     DX - lineNum | line label - Not sure how this is calculated yet. *TODO*
+
+### 0x9 - RESUME label
+Resume from error handler by jumping to label
+
+Input:
+
+    BX - jumpTargetAddr - offset to jump to in current segment. eg. CS:jumpTargetAddr
 
 ### 0xA - RSET
 Move string into random access FIELD variable. Right justified.
@@ -947,6 +1224,17 @@ Input:
 
     DX - pointer to destination string
 
+### 0x15 - VARPTR$
+Offset of Variable, in Character Form
+
+Input:
+
+    BX - variable - pointer to variable
+
+Return:
+
+    BX - pointer to string variable
+
 ### 0x19 - float to int
 Convert float to int
 
@@ -970,13 +1258,51 @@ Input:
 
     SI - pointer to float value
 
+### 0x23 - Exponentiation Operator (float)
+The ^ operator performs exponentiation. Result is stored in temp var.
+
+Input:
+
+    SI - float - base
+    DI - float - power
+
+### 0x24 - Exponentiation Operator (double)
+The ^ operator performs exponentiation. Result is stored in temp var.
+eg. SI ^ DI
+
+Input:
+
+    SI - double - base
+    DI - double - power
+
+### 0x2F - SGN (float)
+Sign of float value. Stored in temp var.
+
+ 1 if positive
+ 0 if 0
+-1 if negative
+
+Input:
+    
+    SI - float - pointer to float
+
+### 0x30 - SGN (double)
+Sign of double value. Stored in temp var.
+
+1 if positive
+0 if 0
+-1 if negative
+
+Input:
+
+    SI - double - pointer to double
+
 ### 0x43 - DIM (dynamic float)
 Create dynamic array
 
 Array dimensions are pushed to the stack as Integers (left to right order)
 
-Second byte of data after INT instruction.
-*TODO* Work out what the value means. Currently only observed to be 0x02.
+Second byte of data after INT instruction - number of dimensions
 
 eg.
 ```asm
@@ -999,8 +1325,8 @@ Create dynamic array
 
 Array dimensions are pushed to the stack as Integers (left to right order)
 
-Second byte of data after INT instruction.
-*TODO* Work out what the value means. Currently only observed to be 0x02.
+Second byte of data after INT instruction - number of dimensions
+
 
 Input:
 
@@ -1011,8 +1337,7 @@ Create dynamic array
 
 Array dimensions are pushed to the stack as Integers (left to right order)
 
-Second byte of data after INT instruction.
-*TODO* Work out what the value means. Currently only observed to be 0x02.
+Second byte of data after INT instruction - number of dimensions
 
 Input:
 
@@ -1023,25 +1348,99 @@ Create dynamic array
 
 Array dimensions are pushed to the stack as Integers (left to right order)
 
-Second byte of data after INT instruction.
-*TODO* Work out what the value means. Currently only observed to be 0x02.
+Second byte of data after INT instruction - number of dimensions
 
 Input:
 
     BX - pointer to array
 
-### 0x47 - ERASE (dynamic)
+### 0x47 - ERASE float (dynamic)
 Erase dynamic array
 
-*TODO* work out arguments.
+Input:
 
-### 0x4B - ERASE (static)
+    DI - pointer to dynamic array
+
+### 0x48 - ERASE double (dynamic)
+Erase dynamic array
+
+Input:
+
+    DI - pointer to dynamic array
+
+### 0x49 - ERASE int (dynamic)
+Erase dynamic array
+
+Input:
+
+    DI - pointer to dynamic array
+
+### 0x4A - ERASE str (dynamic)
+Erase dynamic array
+
+Input:
+
+    DI - pointer to dynamic array
+
+### 0x4B - ERASE float (static)
 Erase bytes in array to zero.
 
 Input:
 
     DI - pointer to array
-    CX - number of bytes to erase
+    CX - number of records to erase
+
+### 0x4C - ERASE double (static)
+Erase bytes in array to zero.
+
+Input:
+
+    DI - pointer to array
+    CX - number of records to erase
+
+### 0x4D - ERASE int (static)
+Erase bytes in array to zero.
+
+Input:
+
+    DI - pointer to array
+    CX - number of records to erase
+
+### 0x4E - ERASE str (static)
+Erase bytes in array to zero.
+
+Input:
+
+    DI - pointer to array
+    CX - number of records to erase
+
+### 0x4F - REDIM (float)
+Redimension dynamic array
+
+Array dimensions are pushed to the stack as Integers (left to right order)
+
+Second byte of data after INT instruction - number of dimensions
+
+### 0x50 - REDIM (double)
+Redimension dynamic array
+
+Array dimensions are pushed to the stack as Integers (left to right order)
+
+Second byte of data after INT instruction - number of dimensions
+
+### 0x51 - REDIM (int)
+Redimension dynamic array
+
+Array dimensions are pushed to the stack as Integers (left to right order)
+
+Second byte of data after INT instruction - number of dimensions
+
+### 0x52 - REDIM (string)
+Redimension dynamic array
+
+Array dimensions are pushed to the stack as Integers (left to right order)
+
+Second byte of data after INT instruction - number of dimensions
 
 ### 0x53 - ?? start subroutine
 
@@ -1069,7 +1468,8 @@ Return:
 ### 0x56 - ?? used in b# = CDBL(a%)
 Integer value pointer in BX
 
-### 0x57 - push integer to stack
+### 0x57 - store int as float in temp var
+Convert integer value to float and store it in temp storage at DS:1A
 
 Input:
 
@@ -1082,6 +1482,17 @@ Input:
 
     BX - RHS pointer to source string
     DX - LHS pointer to field string
+
+### 0x5C - MID$ statement
+Assign substring
+`MID$(stringvar,n[,length]) = stringexpr`
+
+Input:
+
+    BX - stringexpr - string pointer to src string
+    DX - stringvar - string pointer to assignment target string
+    CX - n - integer value
+    AX - length - integer value, 0x7fff when not supplied
 
 ### 0x60 - RETURN
 RETURN from gosub
@@ -1113,9 +1524,12 @@ Input:
 
     SI - pointer to float value
 
-### 0x73 - ??
-Seen between 0x7B and 0x7E
+### 0x73 - store float as double in temp var
+Convert float value to double and store in temp var
 
+Input:
+
+    SI - pointer to float value
 
 ### 0x75 - CINT (float)
 Convert float to integer
@@ -1159,6 +1573,9 @@ convert double to float and store in internal float
 Input:
 
     SI - double pointer
+
+### 0x7A - convert temp vart from double to float
+Convert temp var from double to float. Maybe???
 
 ### 0x7B - Copy float from one var to another
 eg. `A = 10`
@@ -1209,6 +1626,20 @@ Add two doubles together and push result to stack
 Input:
 SI - pointer to first double
 DI - pointer to second double
+
+### 0x81 - Addition temp var + (float)
+Add float to temp var storing result in temp var
+
+Input:
+
+    DI - float - pointer to float to be added.
+
+### 0x82 - Addition temp var + (double)
+Add double to temp var storing result in temp var
+
+Input:
+
+    DI - double - pointer to double to be added.
 
 ### 0x87 - Division (float)
 Dived two floats and push result to stack
@@ -1282,6 +1713,44 @@ Input:
 SI - left hand double pointer
 DI - right hand double pointer
 
+### 0xA1 - compare float to temp var
+Compare float to temp var
+
+Input:
+
+    DI - float - pointer to float to compare with temp var
+
+### 0xA2 - compare double to temp var
+Compare double to temp var
+
+Input:
+
+    DI - double - pointer to double to compare with temp var
+### 0xA5 - ???? seems to be comparing temp var and float??
+
+```basic
+IF c% = POINT(1) THEN
+```
+
+```asm
+       1000:008d 8b  1e  62       MOV        BX ,word ptr [0x1862 ]
+                 18
+       1000:0091 cd  3f           INT        0x3f
+       1000:0093 57              db         57h                       I3F_57_STORE_INT_AS_FLOAT_TMP
+       1000:0094 bb  01  00       MOV        BX ,0x1
+       1000:0097 ba  ff  7f       MOV        DX ,0x7fff
+       1000:009a cd  3f           INT        0x3f
+       1000:009c 71              db         71h                       I3F_71_UNK
+       1000:009d 80              ??         80h
+       1000:009e cd  3d           INT        0x3d
+       1000:00a0 2a              db         2Ah                       INT_3D_2A_POINT_VAL
+       1000:00a1 cd  3f           INT        0x3f
+       1000:00a3 a5              db         A5h                       I3F_A5_UNK
+       1000:00a4 80              ??         80h
+       1000:00a5 74  03           JZ         LAB_1000_00aa
+       1000:00a7 e9  0c  00       JMP        LAB_1000_00b6
+
+```
 ### 0xAB - multiply float by power of 2
 Multiply float by power of 2 (2 byte command) push resulting float to stack
 
@@ -1297,6 +1766,20 @@ Input:
 
     SI - pointer to float to multiply
     Second command byte - number of power to multiply by. eg 3 for 2^3 multiply by 8
+
+### 0xAF - float negation
+Store negation of float in temp var
+
+Input:
+
+    SI - float - pointer to float to negate.
+
+### 0x80 - double negation
+Store negation of double in temp var
+
+Input:
+
+    SI - double - pointer to double to negate.
 
 ### 0xB3 - ?? FIELD start maybe
 
@@ -1343,6 +1826,18 @@ Loads the parsed value into variable
 Input:
 
     BX - pointer to target variable
+
+### 0xBA - LEN
+Length of string
+`l = LEN(s$)`
+
+Input:
+
+    BX - string - pointer to string
+
+Return:
+
+    BX - length - integer value
 
 ### 0xBC - print to screen start
 Seems to be set when printing data to screen.
