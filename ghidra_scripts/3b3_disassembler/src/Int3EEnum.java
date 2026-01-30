@@ -72,7 +72,7 @@ public enum Int3EEnum {
     INT_3E_47_ENVIRON$_ORDINAL(0x47),
     INT_3E_48_UNK(0x48),
     INT_3E_49_UNK(0x49),
-    INT_3E_4A_UNK(0x4a),
+    INT_3E_4A_PALETTE(0x4a),
     INT_3E_4B_UNK(0x4b),
     INT_3E_4C_UNK(0x4c),
     INT_3E_4D_UNK(0x4d),

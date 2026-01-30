@@ -96,6 +96,7 @@
     * [0x44 - LOCATE](#0x44---locate)
     * [0x46 - ENVIRON$ (name)](#0x46---environ-name)
     * [0x47 - ENVIRON$ (ordinal)](#0x47---environ-ordinal)
+    * [0x4A - PALETTE](#0x4a---palette)
     * [0x55 - PRESET (step)](#0x55---preset-step)
     * [0x56 - PSET](#0x56---pset)
     * [0x58 - PUT (graphics)](#0x58---put-graphics)
@@ -959,6 +960,15 @@ Input:
 Returns:
 
     BX - pointer to string containing env value.
+
+### 0x4A - PALETTE
+Change Color in the Palette
+`PALETTE [attribute, color]`
+
+Input:
+
+    BX - attribute - integer
+    DX - color - integer
 
 ### 0x55 - PRESET (step)
 Draw Point on Screen using STEP (relative to last graphics point)
