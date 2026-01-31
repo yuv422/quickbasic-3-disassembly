@@ -97,6 +97,10 @@
     * [0x46 - ENVIRON$ (name)](#0x46---environ-name)
     * [0x47 - ENVIRON$ (ordinal)](#0x47---environ-ordinal)
     * [0x4A - PALETTE](#0x4a---palette)
+    * [0x51 - PLAY](#0x51---play)
+    * [0x52 - PLAY ON](#0x52---play-on)
+    * [0x53 - PLAY OFF](#0x53---play-off)
+    * [0x54 - PLAY STOP](#0x54---play-stop)
     * [0x55 - PRESET (step)](#0x55---preset-step)
     * [0x56 - PSET](#0x56---pset)
     * [0x58 - PUT (graphics)](#0x58---put-graphics)
@@ -122,6 +126,7 @@
   * [0x3f Interrupt](#0x3f-interrupt)
     * [0x2 - ON ERROR trap](#0x2---on-error-trap)
     * [0x4 - ON KEY trap](#0x4---on-key-trap)
+    * [0x8 - ON PLAY trap](#0x8---on-play-trap)
     * [0x9 - RESUME label](#0x9---resume-label)
     * [0xA - RSET](#0xa---rset)
     * [0xD - READ (float)](#0xd---read-float)
@@ -133,6 +138,10 @@
     * [0x21 - ?? push float to stack](#0x21----push-float-to-stack)
     * [0x23 - Exponentiation Operator (float)](#0x23---exponentiation-operator-float)
     * [0x24 - Exponentiation Operator (double)](#0x24---exponentiation-operator-double)
+    * [0x2B - ABS (float)](#0x2b---abs-float)
+    * [0x2C - ABS (double)](#0x2c---abs-double)
+    * [0x2D - ABS (float) temp var](#0x2d---abs-float-temp-var)
+    * [0x2E - ABS (double) temp var](#0x2e---abs-double-temp-var)
     * [0x2F - SGN (float)](#0x2f---sgn-float)
     * [0x30 - SGN (double)](#0x30---sgn-double)
     * [0x43 - DIM (dynamic float)](#0x43---dim-dynamic-float)
@@ -161,6 +170,18 @@
     * [0x60 - RETURN](#0x60---return)
     * [0x61 - Copy string](#0x61---copy-string)
     * [0x62 - Compare strings](#0x62---compare-strings)
+    * [0x63 - PRINT (float)](#0x63---print-float)
+    * [0x64 - PRINT (double)](#0x64---print-double)
+    * [0x65 - PRINT (integer)](#0x65---print-integer)
+    * [0x66 - PRINT (string)](#0x66---print-string)
+    * [0x67 - PRINT (float) semicolon](#0x67---print-float-semicolon)
+    * [0x68 - PRINT (double) semicolon](#0x68---print-double-semicolon)
+    * [0x69 - PRINT (integer) semicolon](#0x69---print-integer-semicolon)
+    * [0x6A - PRINT (string) semicolon](#0x6a---print-string-semicolon)
+    * [0x6B - PRINT (float) newline](#0x6b---print-float-newline)
+    * [0x6C - PRINT (double) newline](#0x6c---print-double-newline)
+    * [0x6D - PRINT (integer) newline](#0x6d---print-integer-newline)
+    * [0x6E - PRINT (string) newline](#0x6e---print-string-newline)
     * [0x6F - PUSH float](#0x6f---push-float)
     * [0x73 - store float as double in temp var](#0x73---store-float-as-double-in-temp-var)
     * [0x75 - CINT (float)](#0x75---cint-float)
@@ -183,6 +204,8 @@
     * [0x90 - Multiplication (double)](#0x90---multiplication-double)
     * [0x97 - Subtraction (float)](#0x97---subtraction-float)
     * [0x98 - Subtraction (double)](#0x98---subtraction-double)
+    * [0x99 - Subtraction temp var - (float)](#0x99---subtraction-temp-var---float)
+    * [0x9B - Subtraction (float) - temp var](#0x9b---subtraction-float---temp-var)
     * [0x9F - compare floats](#0x9f---compare-floats)
     * [0xA0 - compare doubles](#0xa0---compare-doubles)
     * [0xA1 - compare float to temp var](#0xa1---compare-float-to-temp-var)
@@ -970,6 +993,27 @@ Input:
     BX - attribute - integer
     DX - color - integer
 
+### 0x51 - PLAY
+Plays a melody according to instructions specified as a string
+expression.
+`PLAY s$`
+
+Input:
+
+    BX - s - pointer to string containing music instructions
+
+### 0x52 - PLAY ON
+Enable music trap
+
+### 0x53 - PLAY OFF
+Disable music trap
+
+### 0x54 - PLAY STOP
+PLAY STOP inhibits trapping. QuickBASIC continues checking
+the buffer, and if the notes remaining are fewer than
+specified in the ON PLAY statement, a subsequent PLAY ON
+results in an immediate trap.
+
 ### 0x55 - PRESET (step)
 Draw Point on Screen using STEP (relative to last graphics point)
 
@@ -1191,6 +1235,16 @@ Input:
     BX - n - key number (1 to 20)
     DX - lineNum | line label - Not sure how this is calculated yet. *TODO*
 
+### 0x8 - ON PLAY trap
+Trap for Background Music Remaining
+`ON PLAY(queuelimit) GOSUB {linenum | linelabel}`
+
+Input:
+
+    BX - queueLimit - integer value
+    DX - jumpTargetAddr - offset to jump to in current segment. eg. CS:jumpTargetAddr
+
+
 ### 0x9 - RESUME label
 Resume from error handler by jumping to label
 
@@ -1284,6 +1338,26 @@ Input:
 
     SI - double - base
     DI - double - power
+
+### 0x2B - ABS (float)
+Absolute value of float. Result stored in temp var
+
+Input:
+
+    SI - pointer to float
+
+### 0x2C - ABS (double)
+Absolute value of double. Result stored in temp var
+
+Input:
+
+    SI - pointer to double
+
+### 0x2D - ABS (float) temp var
+Absolute value of float in temp var.
+
+### 0x2E - ABS (double) temp var
+Absolute value of double in temp var.
 
 ### 0x2F - SGN (float)
 Sign of float value. Stored in temp var.
@@ -1527,6 +1601,90 @@ Return:
 
     BX - 0 if strings are equal, non-zero otherwise
 
+### 0x63 - PRINT (float)
+Print float to output
+
+Input:
+
+    BX - pointer to float
+
+### 0x64 - PRINT (double)
+Print double to output
+
+Input:
+
+    BX - pointer to double
+
+### 0x65 - PRINT (integer)
+Print integer to output
+
+Input:
+
+    BX - integer value to print
+
+### 0x66 - PRINT (string)
+Print string to output
+
+Input:
+
+    BX - pointer to string
+
+### 0x67 - PRINT (float) semicolon
+Print float to output
+
+Input:
+
+    BX - pointer to float
+
+### 0x68 - PRINT (double) semicolon
+Print double to output
+
+Input:
+
+    BX - pointer to double
+
+### 0x69 - PRINT (integer) semicolon
+Print integer to output
+
+Input:
+
+    BX - integer value to print
+
+### 0x6A - PRINT (string) semicolon
+Print string to output
+
+Input:
+
+    BX - pointer to string
+
+### 0x6B - PRINT (float) newline
+Print float to output and add new line
+
+Input:
+
+    BX - pointer to float
+
+### 0x6C - PRINT (double) newline
+Print double to output and add new line
+
+Input:
+
+    BX - pointer to double
+
+### 0x6D - PRINT (integer) newline
+Print integer to output and add new line
+
+Input:
+
+    BX - integer value to print
+
+### 0x6E - PRINT (string) newline
+Print string to output and add new line
+
+Input:
+
+    BX - pointer to string
+
 ### 0x6F - PUSH float
 Push float onto stack.
 
@@ -1698,6 +1856,20 @@ subtract two doubles and push result to stack
 Input:
 SI - pointer to first double
 DI - pointer to second double
+
+### 0x99 - Subtraction temp var - (float)
+Subtract float from temp var storing result in temp var
+
+Input:
+
+    DI - float - pointer to float to subtract.
+
+### 0x9B - Subtraction (float) - temp var
+Subtract temp var from float storing result in temp var
+
+Input:
+
+    SI - float - pointer to float to subtracted from.
 
 ### 0x9F - compare floats
 Compare two floats and set x86 flags accordingly
