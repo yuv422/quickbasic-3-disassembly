@@ -140,6 +140,7 @@
     * [0x19 - float to int](#0x19---float-to-int)
     * [0x1D - float to boolean](#0x1d---float-to-boolean)
     * [0x1E - double to boolean](#0x1e---double-to-boolean)
+    * [0x1F - tmpVarFloat to boolean](#0x1f---tmpvarfloat-to-boolean)
     * [0x21 - ?? push float to stack](#0x21----push-float-to-stack)
     * [0x23 - Exponentiation Operator (float)](#0x23---exponentiation-operator-float)
     * [0x24 - Exponentiation Operator (double)](#0x24---exponentiation-operator-double)
@@ -1359,6 +1360,14 @@ Convert double to boolean.
 Input:
 
     SI - double - pointer to double to convert
+
+Return:
+
+    BX - boolean integer value. True = -1, False = 0
+
+### 0x1F - tmpVarFloat to boolean
+Convert tmpVarFloat to boolean.
+0 = false any other value = true
 
 Return:
 

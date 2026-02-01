@@ -29,7 +29,7 @@ public enum Int3FEnum {
     I3F_1C_UNK(0x1c),
     I3F_1D_FLOAT_TO_BOOL(0x1d),
     I3F_1E_DOUBLE_TO_BOOL(0x1e),
-    I3F_1F_UNK(0x1f),
+    I3F_1F_TMP_VAR_FLOAT_TO_BOOL(0x1f),
     I3F_20_UNK(0x20),
     I3F_21_PUSH_FLOAT(0x21),
     I3F_22_UNK(0x22),
