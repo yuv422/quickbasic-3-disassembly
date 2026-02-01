@@ -7,10 +7,12 @@
   * [GOSUB](#gosub)
   * [GOTO](#goto)
   * [INP](#inp)
+  * [Temp variables](#temp-variables)
   * [BASIC Compiled interrupt functions](#basic-compiled-interrupt-functions)
   * [0x3d Interrupt](#0x3d-interrupt)
     * [0x1 - FIX (float)](#0x1---fix-float)
     * [0x2 - FIX (double)](#0x2---fix-double)
+    * [0x3 - ??](#0x3---)
     * [0x5 - CHR$](#0x5---chr)
     * [0x6 - INKEY$](#0x6---inkey)
     * [0x7 - INPUT$](#0x7---input)
@@ -135,6 +137,8 @@
     * [0x10 - READ (string)](#0x10---read-string)
     * [0x15 - VARPTR$](#0x15---varptr)
     * [0x19 - float to int](#0x19---float-to-int)
+    * [0x1D - float to boolean](#0x1d---float-to-boolean)
+    * [0x1E - double to boolean](#0x1e---double-to-boolean)
     * [0x21 - ?? push float to stack](#0x21----push-float-to-stack)
     * [0x23 - Exponentiation Operator (float)](#0x23---exponentiation-operator-float)
     * [0x24 - Exponentiation Operator (double)](#0x24---exponentiation-operator-double)
@@ -167,6 +171,8 @@
     * [0x57 - store int as float in temp var](#0x57---store-int-as-float-in-temp-var)
     * [0x5B - LSET](#0x5b---lset)
     * [0x5C - MID$ statement](#0x5c---mid-statement)
+    * [0x5E - ON GOTO](#0x5e---on-goto)
+    * [0x5D - ON GOSUB](#0x5d---on-gosub)
     * [0x60 - RETURN](#0x60---return)
     * [0x61 - Copy string](#0x61---copy-string)
     * [0x62 - Compare strings](#0x62---compare-strings)
@@ -183,6 +189,8 @@
     * [0x6D - PRINT (integer) newline](#0x6d---print-integer-newline)
     * [0x6E - PRINT (string) newline](#0x6e---print-string-newline)
     * [0x6F - PUSH float](#0x6f---push-float)
+    * [0x71 - Push float temp var onto stack](#0x71---push-float-temp-var-onto-stack)
+    * [0x74 - ?? convert float temp var to double temp var](#0x74----convert-float-temp-var-to-double-temp-var)
     * [0x73 - store float as double in temp var](#0x73---store-float-as-double-in-temp-var)
     * [0x75 - CINT (float)](#0x75---cint-float)
     * [0x76 - CINT (double)](#0x76---cint-double)
@@ -198,6 +206,7 @@
     * [0x80 - Addition (double)](#0x80---addition-double)
     * [0x81 - Addition temp var + (float)](#0x81---addition-temp-var--float)
     * [0x82 - Addition temp var + (double)](#0x82---addition-temp-var--double)
+    * [0x85 - ?? Addition stack + temp var (float)](#0x85----addition-stack--temp-var-float)
     * [0x87 - Division (float)](#0x87---division-float)
     * [0x88 - Division (double)](#0x88---division-double)
     * [0x8f - Multiplication (float)](#0x8f---multiplication-float)
@@ -206,6 +215,9 @@
     * [0x98 - Subtraction (double)](#0x98---subtraction-double)
     * [0x99 - Subtraction temp var - (float)](#0x99---subtraction-temp-var---float)
     * [0x9B - Subtraction (float) - temp var](#0x9b---subtraction-float---temp-var)
+    * [0x9C - ?? subtract double - temp var (float)](#0x9c----subtract-double---temp-var-float)
+    * [0x9D - ?? subtract float temp var from stack value](#0x9d----subtract-float-temp-var-from-stack-value)
+    * [0x9E - Subtract tmpVarFloat from doubleStackValue](#0x9e---subtract-tmpvarfloat-from-doublestackvalue)
     * [0x9F - compare floats](#0x9f---compare-floats)
     * [0xA0 - compare doubles](#0xa0---compare-doubles)
     * [0xA1 - compare float to temp var](#0xa1---compare-float-to-temp-var)
@@ -284,6 +296,13 @@ eg. `a% = INP(42)` becomes
        1000:0046 a3  56  18       MOV        [0x1856 ],AX
 ```
 
+## Temp variables
+Some operations require an internal temporary variable.
+
+These live at
+- `DS:1A` for float values
+- `DS:16` for double values
+
 ## BASIC Compiled interrupt functions
 
 Basic code is compiled into assembly with the original BASIC code converted into
@@ -317,6 +336,12 @@ floor double and push result onto stack
 Input:
 
     BX - pointer to double value
+
+### 0x3 - ??
+
+Input:
+
+    BX - pointer to float
 
 ### 0x5 - CHR$
 Convert ASCII Code to Character
@@ -518,6 +543,7 @@ Returns the error number of the most recent runtime error.
 Results:
 
     BX - errorNumber - integer
+
 ### 0x20 - LPOS
 get position of print head.
 `a = LPOS(1)`
@@ -1310,6 +1336,30 @@ Returns:
 
     BX - converted int value
 
+### 0x1D - float to boolean
+Convert float to boolean.
+0 = false any other value = true
+
+Input:
+
+    SI - float - pointer to float to convert
+
+Return:
+
+    BX - boolean integer value. True = -1, False = 0
+
+### 0x1E - double to boolean
+Convert double to boolean.
+0 = false any other value = true
+
+Input:
+
+    SI - double - pointer to double to convert
+
+Return:
+
+    BX - boolean integer value. True = -1, False = 0
+
 ### 0x21 - ?? push float to stack
 Push float onto stack. Seen in `DEF SEG = nnnn` where nnnn is a float
 ```asm
@@ -1578,6 +1628,38 @@ Input:
     CX - n - integer value
     AX - length - integer value, 0x7fff when not supplied
 
+### 0x5E - ON GOTO
+Branch to nth Item in Line List
+`ON n GOTO addr, [,addr]...`
+Total number of addresses and address ptrs are stored after the opcode
+
+eg.
+```asm
+       1000:004e cd  3f           INT        0x3f
+       1000:0050 5e              db         5Eh             I3F_5E_UNK
+       1000:0051 03              ??         03h             numAddrs
+       1000:0052 4e  00           dw         4Eh
+       1000:0054 5d  00           dw         5Dh
+       1000:0056 6c  00           dw         6Ch
+```
+number of addresses stored in byte after opcode
+each address is a 2 byte pointer to code CS:ptr
+
+Input:
+
+    BX - n - integer value
+
+### 0x5D - ON GOSUB
+Branch to nth Item in subroutine List
+`ON n GOSUB addr, [,addr]...`
+Total number of addresses and address ptrs are stored after the opcode
+
+each address is a pointer to code CS:ptr
+
+Input:
+
+    BX - n - integer value
+
 ### 0x60 - RETURN
 RETURN from gosub
 
@@ -1691,6 +1773,13 @@ Push float onto stack.
 Input:
 
     SI - pointer to float value
+
+### 0x71 - Push float temp var onto stack
+I think this pushes the current value of temp var onto a stack
+has a second byte operand which appears to start at 0x80 and increment with each
+invocation. arithmetic operations seem to also have this same value.
+
+### 0x74 - ?? convert float temp var to double temp var
 
 ### 0x73 - store float as double in temp var
 Convert float value to double and store in temp var
@@ -1809,6 +1898,11 @@ Input:
 
     DI - double - pointer to double to be added.
 
+### 0x85 - ?? Addition stack + temp var (float)
+Has second byte seems to start at 0x80 and increment for each call to op
+Result of addition is stored in temp var
+
+
 ### 0x87 - Division (float)
 Dived two floats and push result to stack
 `PUSH SI / DI`
@@ -1870,6 +1964,18 @@ Subtract temp var from float storing result in temp var
 Input:
 
     SI - float - pointer to float to subtracted from.
+
+### 0x9C - ?? subtract double - temp var (float)
+`tmpVarFloat = d - tmpVarFloat`
+
+Input:
+
+    SI - d - pointer to double
+
+### 0x9D - ?? subtract float temp var from stack value
+
+### 0x9E - Subtract tmpVarFloat from doubleStackValue
+`tmpVarDouble = doubleStackVal - tmpVarFloat`
 
 ### 0x9F - compare floats
 Compare two floats and set x86 flags accordingly
