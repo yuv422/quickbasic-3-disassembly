@@ -208,26 +208,30 @@
     * [0x80 - Addition (double)](#0x80---addition-double)
     * [0x81 - Addition temp var + (float)](#0x81---addition-temp-var--float)
     * [0x82 - Addition temp var + (double)](#0x82---addition-temp-var--double)
-    * [0x85 - ?? Addition stack + temp var (float)](#0x85----addition-stack--temp-var-float)
+    * [0x85 - Addition stack + temp var (float)](#0x85---addition-stack--temp-var-float)
     * [0x87 - Division (float)](#0x87---division-float)
     * [0x88 - Division (double)](#0x88---division-double)
+    * [0x89 - Division tmpVarFloat by float](#0x89---division-tmpvarfloat-by-float)
     * [0x8f - Multiplication (float)](#0x8f---multiplication-float)
     * [0x90 - Multiplication (double)](#0x90---multiplication-double)
+    * [0x91 - Multiplication float tmpVarFloat](#0x91---multiplication-float-tmpvarfloat)
+    * [0x95 - Multiplication stack * temp var (float)](#0x95---multiplication-stack--temp-var-float)
     * [0x97 - Subtraction (float)](#0x97---subtraction-float)
     * [0x98 - Subtraction (double)](#0x98---subtraction-double)
     * [0x99 - Subtraction temp var - (float)](#0x99---subtraction-temp-var---float)
     * [0x9B - Subtraction (float) - temp var](#0x9b---subtraction-float---temp-var)
     * [0x9C - ?? subtract double - temp var (float)](#0x9c----subtract-double---temp-var-float)
-    * [0x9D - ?? subtract float temp var from stack value](#0x9d----subtract-float-temp-var-from-stack-value)
+    * [0x9D - Subtract tmpVarFloat from floatStackValue](#0x9d---subtract-tmpvarfloat-from-floatstackvalue)
     * [0x9E - Subtract tmpVarFloat from doubleStackValue](#0x9e---subtract-tmpvarfloat-from-doublestackvalue)
     * [0x9F - compare floats](#0x9f---compare-floats)
     * [0xA0 - compare doubles](#0xa0---compare-doubles)
     * [0xA1 - compare float to temp var](#0xa1---compare-float-to-temp-var)
     * [0xA2 - compare double to temp var](#0xa2---compare-double-to-temp-var)
-    * [0xA5 - ???? seems to be comparing temp var and float??](#0xa5----seems-to-be-comparing-temp-var-and-float)
+    * [0xA5 - Compare tmpVarFloat and stack float value](#0xa5---compare-tmpvarfloat-and-stack-float-value)
     * [0xA7 - compare float with zero](#0xa7---compare-float-with-zero)
     * [0xA9 - compare tmpVarFloat with zero](#0xa9---compare-tmpvarfloat-with-zero)
     * [0xAB - multiply float by power of 2](#0xab---multiply-float-by-power-of-2)
+    * [0xAD - multiply tmpVarFloat by power of 2](#0xad---multiply-tmpvarfloat-by-power-of-2)
     * [0xAF - float negation](#0xaf---float-negation)
     * [0x80 - double negation](#0x80---double-negation)
     * [0xB3 - ?? FIELD start maybe](#0xb3----field-start-maybe)
@@ -1913,7 +1917,7 @@ Input:
 
     DI - double - pointer to double to be added.
 
-### 0x85 - ?? Addition stack + temp var (float)
+### 0x85 - Addition stack + temp var (float)
 Has second byte seems to start at 0x80 and increment for each call to op
 Result of addition is stored in temp var
 
@@ -1934,6 +1938,13 @@ Input:
 SI - pointer to first double
 DI - pointer to second double
 
+### 0x89 - Division tmpVarFloat by float
+divide tmpVarFloat by float storing result in tmpVarFloat
+
+Input:
+
+    DI - float - pointer to float to divide by
+
 ### 0x8f - Multiplication (float)
 Multiply two floats together and push result to stack
 `PUSH SI * DI`
@@ -1949,6 +1960,17 @@ Multiply two doubles together and push result to stack
 Input:
 SI - pointer to first double
 DI - pointer to second double
+
+### 0x91 - Multiplication float tmpVarFloat
+Multiply a float value by tmpVarFloat and store result in tmpVarFloat
+
+Input:
+    
+    DI - float - pointer to float
+
+### 0x95 - Multiplication stack * temp var (float)
+Has second byte seems to start at 0x80 and increment for each call to op
+Result of multiplication is stored in temp var
 
 ### 0x97 - Subtraction (float)
 subtract two floats and push result to stack
@@ -1987,7 +2009,7 @@ Input:
 
     SI - d - pointer to double
 
-### 0x9D - ?? subtract float temp var from stack value
+### 0x9D - Subtract tmpVarFloat from floatStackValue
 
 ### 0x9E - Subtract tmpVarFloat from doubleStackValue
 `tmpVarDouble = doubleStackVal - tmpVarFloat`
@@ -2029,7 +2051,7 @@ Compare double to temp var
 Input:
 
     DI - double - pointer to double to compare with temp var
-### 0xA5 - ???? seems to be comparing temp var and float??
+### 0xA5 - Compare tmpVarFloat and stack float value
 
 ```basic
 IF c% = POINT(1) THEN
@@ -2087,6 +2109,20 @@ Input:
 
     SI - pointer to float to multiply
     Second command byte - number of power to multiply by. eg 3 for 2^3 multiply by 8
+
+### 0xAD - multiply tmpVarFloat by power of 2
+`tmpVarFloat = tempVarFloat * 2^n`
+n is supplied in command operand
+
+eg. `TIMER * 16`
+
+```asm
+       1000:00a4 cd  3d           INT        0x3d
+       1000:00a6 43              db         43h                   INT_3D_43_TIMER
+       1000:00a7 cd  3f           INT        0x3f
+       1000:00a9 ad              db         ADh                   I3F_AD_MUL_TMP_VAR_POWER_OF_2_FLOAT
+       1000:00aa 04              ??         04h
+```
 
 ### 0xAF - float negation
 Store negation of float in temp var
