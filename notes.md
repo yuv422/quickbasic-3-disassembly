@@ -79,7 +79,7 @@
     * [0x1C - FILES](#0x1c---files)
     * [0x1D - FILES (no argument)](#0x1d---files-no-argument)
     * [0x1E - OPEN](#0x1e---open)
-    * [0x20 - ?? seen in OPEN test](#0x20----seen-in-open-test)
+    * [0x20 - OPEN mode](#0x20---open-mode)
     * [0x21 - CLOSE](#0x21---close)
     * [0x22 - CLOSE (close all open files)](#0x22---close-close-all-open-files)
     * [0x24 - KILL](#0x24---kill)
@@ -875,8 +875,8 @@ Input:
     DX - filename - pointer to string filename
     CX - length - integer
 
-### 0x20 - ?? seen in OPEN test
-Seems to pass a value in BX
+### 0x20 - OPEN mode
+Used to set the file IO mode in the subsequent OPEN command
 ```asm
        1000:0040 bb  02  00       MOV        BX ,0x2
        1000:0043 cd  3e           INT        0x3e
@@ -887,6 +887,13 @@ Seems to pass a value in BX
        1000:004e cd  3e           INT        0x3e
        1000:0050 1e              ??         1Eh
 ```
+Input:
+
+    BX - mode - file io mode
+        0 - INPUT
+        1 - OUTPUT
+        2 - RANDOM (default)
+        3 - APPEND
 
 ### 0x21 - CLOSE
 Close File or Device

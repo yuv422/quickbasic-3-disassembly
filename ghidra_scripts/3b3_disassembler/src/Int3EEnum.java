@@ -30,7 +30,7 @@ public enum Int3EEnum {
     INT_3E_1D_FILES_NO_ARGS(0x1d),
     INT_3E_1E_OPEN(0x1e),
     INT_3E_1F_UNK(0x1f),
-    INT_3E_20_UNK(0x20),
+    INT_3E_20_OPEN_MODE(0x20),
     INT_3E_21_CLOSE(0x21),
     INT_3E_22_CLOSE_NO_ARGS(0x22),
     INT_3E_23_UNK(0x23),
