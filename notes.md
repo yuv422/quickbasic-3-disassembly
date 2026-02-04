@@ -1979,12 +1979,33 @@ Input:
 SI - pointer to first double
 DI - pointer to second double
 
-### 0x91 - Multiplication float tmpVarFloat
-Multiply a float value by tmpVarFloat and store result in tmpVarFloat
+### 0x91 - Multiplication float tmpVarFloat DI
+Multiply a float value in DI by tmpVarFloat and store result in tmpVarFloat
 
 Input:
     
     DI - float - pointer to float
+
+### 0x92 - Multiplication double tmpVarDouble DI
+Multiply a float value in DI by tmpVarDouble and store result in tmpVarDouble
+
+Input:
+
+    DI - double - pointer to double
+
+### 0x93 - Multiplication float tmpVarFloat SI
+Multiply a float value in SI by tmpVarFloat and store result in tmpVarFloat
+
+Input:
+
+    SI - float - pointer to float
+
+### 0x94 - Multiplication double tmpVarDouble SI
+Multiply a float value in SI by tmpVarDouble and store result in tmpVarDouble
+
+Input:
+
+    SI - double - pointer to double
 
 ### 0x95 - Multiplication stack * temp var (float)
 Has second byte seems to start at 0x80 and increment for each call to op
