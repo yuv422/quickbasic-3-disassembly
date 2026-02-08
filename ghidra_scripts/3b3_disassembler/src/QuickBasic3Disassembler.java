@@ -97,7 +97,7 @@ public class QuickBasic3Disassembler extends GhidraScript {
                 if (intCode == 0x3f && (commandByte == 0x5e || commandByte == 0x5d)) { // ON GOTO
                     nextAddress = handleOnGoto(disassembler, nextAddress.subtract(1));
                 } else {
-                    nextAddress = nextAddress.add(getNumCommandBytes(intCode, commandByte, nextAddress)-1); // skip command byte
+                    nextAddress = nextAddress.add(getNumCommandBytes(intCode, commandByte, nextAddress.subtract(1))-1); // skip command byte
                 }
                 if (intCode == 0x3e && (commandByte == 2 || commandByte == 1)) {
                     endReached = true;
