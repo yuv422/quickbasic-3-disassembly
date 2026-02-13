@@ -37,7 +37,9 @@
     * [0x1E - ERL](#0x1e---erl)
     * [0x1F - ERR](#0x1f---err)
     * [0x20 - LPOS](#0x20---lpos)
+    * [0x22 - INT (integer)](#0x22---int-integer)
     * [0x23 - DATE$](#0x23---date)
+    * [0x24 - TIME$](#0x24---time)
     * [0x25 - CSRLIN](#0x25---csrlin)
     * [0x27 - POINT (x, y)](#0x27---point-x-y)
     * [0x2A - POINT value](#0x2a---point-value)
@@ -49,10 +51,20 @@
     * [0x32 - VARPTR file](#0x32---varptr-file)
     * [0x33 - RND(n)](#0x33---rndn)
     * [0x34 - RND](#0x34---rnd)
+    * [0x35 - ATN](#0x35---atn)
     * [0x36 - COS](#0x36---cos)
     * [0x37 - EXP](#0x37---exp)
+    * [0x38 - LOG](#0x38---log)
+    * [0x39 - SIN](#0x39---sin)
+    * [0x3A - SQR](#0x3a---sqr)
+    * [0x3B - TAN](#0x3b---tan)
+    * [0x3C - ATN (double)](#0x3c---atn-double)
     * [0x3D - COS (double)](#0x3d---cos-double)
     * [0x3E - EXP (double)](#0x3e---exp-double)
+    * [0x3F - LOG (double)](#0x3f---log-double)
+    * [0x40 - SIN (double)](#0x40---sin-double)
+    * [0x41 - SQR (double)](#0x41---sqr-double)
+    * [0x42 - TAN (double)](#0x42---tan-double)
     * [0x43 - TIMER](#0x43---timer)
     * [0x45 - IOCTL$](#0x45---ioctl)
     * [0x46 - ENVIRON$ (name)](#0x46---environ-name)
@@ -78,6 +90,7 @@
     * [0x14 - DEF SEG (default)](#0x14---def-seg-default)
     * [0x15 - DEF SEG](#0x15---def-seg)
     * [0x17 - DATE$ (write)](#0x17---date-write)
+    * [0x18 - TIME$ (write)](#0x18---time-write)
     * [0x19 - BLOAD (offset from file)](#0x19---bload-offset-from-file)
     * [0x1A - BLOAD](#0x1a---bload)
     * [0x1B - BSAVE](#0x1b---bsave)
@@ -155,15 +168,22 @@
     * [0x1D - float to boolean](#0x1d---float-to-boolean)
     * [0x1E - double to boolean](#0x1e---double-to-boolean)
     * [0x1F - tmpVarFloat to boolean](#0x1f---tmpvarfloat-to-boolean)
+    * [0x20 - tmpVarDouble to boolean](#0x20---tmpvardouble-to-boolean)
     * [0x21 - ?? push float to stack](#0x21----push-float-to-stack)
     * [0x23 - Exponentiation Operator (float)](#0x23---exponentiation-operator-float)
     * [0x24 - Exponentiation Operator (double)](#0x24---exponentiation-operator-double)
+    * [0x25 - Exponentiation Operator using tempFloatVar (float)](#0x25---exponentiation-operator-using-tempfloatvar-float)
+    * [0x26 - Exponentiation Operator using tempDoubleVar (double)](#0x26---exponentiation-operator-using-tempdoublevar-double)
     * [0x2B - ABS (float)](#0x2b---abs-float)
     * [0x2C - ABS (double)](#0x2c---abs-double)
     * [0x2D - ABS (float) temp var](#0x2d---abs-float-temp-var)
     * [0x2E - ABS (double) temp var](#0x2e---abs-double-temp-var)
     * [0x2F - SGN (float)](#0x2f---sgn-float)
     * [0x30 - SGN (double)](#0x30---sgn-double)
+    * [0x31 - SGN (float) temp var](#0x31---sgn-float-temp-var)
+    * [0x32 - SGN (double) temp var](#0x32---sgn-double-temp-var)
+    * [0x39 - start function](#0x39---start-function)
+    * [0x3A - end function](#0x3a---end-function)
     * [0x43 - DIM (dynamic float)](#0x43---dim-dynamic-float)
     * [0x44 - DIM (dynamic double)](#0x44---dim-dynamic-double)
     * [0x45 - DIM (dynamic integer)](#0x45---dim-dynamic-integer)
@@ -183,7 +203,7 @@
     * [0x53 - ?? start subroutine](#0x53----start-subroutine)
     * [0x54 - ?? end subroutine](#0x54----end-subroutine)
     * [0x55 - concatenate strings](#0x55---concatenate-strings)
-    * [0x56 - ?? used in b# = CDBL(a%)](#0x56----used-in-b--cdbla)
+    * [0x56 - store int as double in temp var](#0x56---store-int-as-double-in-temp-var)
     * [0x57 - store int as float in temp var](#0x57---store-int-as-float-in-temp-var)
     * [0x5B - LSET](#0x5b---lset)
     * [0x5C - MID$ statement](#0x5c---mid-statement)
@@ -205,7 +225,8 @@
     * [0x6D - PRINT (integer) newline](#0x6d---print-integer-newline)
     * [0x6E - PRINT (string) newline](#0x6e---print-string-newline)
     * [0x6F - PUSH float](#0x6f---push-float)
-    * [0x71 - Push float temp var onto stack](#0x71---push-float-temp-var-onto-stack)
+    * [0x71 - Push float temp var onto stack (3 param)](#0x71---push-float-temp-var-onto-stack-3-param)
+    * [0x72 - Push double temp var onto stack (3 param)](#0x72---push-double-temp-var-onto-stack-3-param)
     * [0x74 - ?? convert float temp var to double temp var](#0x74----convert-float-temp-var-to-double-temp-var)
     * [0x73 - store float as double in temp var](#0x73---store-float-as-double-in-temp-var)
     * [0x75 - CINT (float)](#0x75---cint-float)
@@ -221,38 +242,48 @@
     * [0x7F - Addition (float)](#0x7f---addition-float)
     * [0x80 - Addition (double)](#0x80---addition-double)
     * [0x81 - Addition temp var + DI (float)](#0x81---addition-temp-var--di-float)
-    * [0x82 - Addition temp var + (double)](#0x82---addition-temp-var--double)
+    * [0x82 - Addition temp var + DI (double)](#0x82---addition-temp-var--di-double)
     * [0x83 - Addition temp var + SI (float)](#0x83---addition-temp-var--si-float)
-    * [0x85 - Addition stack + temp var (float)](#0x85---addition-stack--temp-var-float)
+    * [0x84 - Addition temp var + SI (double)](#0x84---addition-temp-var--si-double)
+    * [0x85 - Addition stack + temp var (float) (3 param)](#0x85---addition-stack--temp-var-float-3-param)
+    * [0x86 - Addition stack + temp var (double) (3 param)](#0x86---addition-stack--temp-var-double-3-param)
     * [0x87 - Division (float)](#0x87---division-float)
     * [0x88 - Division (double)](#0x88---division-double)
     * [0x89 - Division tmpVarFloat by float DI](#0x89---division-tmpvarfloat-by-float-di)
-    * [0x8B - Division tmpVarFloat by float SI](#0x8b---division-tmpvarfloat-by-float-si)
+    * [0x8A - Division tmpVarDouble by double DI](#0x8a---division-tmpvardouble-by-double-di)
+    * [0x8B - Division float SI by tmpVarFloat](#0x8b---division-float-si-by-tmpvarfloat)
+    * [0x8C - Division double SI by tmpVarDouble](#0x8c---division-double-si-by-tmpvardouble)
     * [0x8f - Multiplication (float)](#0x8f---multiplication-float)
     * [0x90 - Multiplication (double)](#0x90---multiplication-double)
     * [0x91 - Multiplication float tmpVarFloat DI](#0x91---multiplication-float-tmpvarfloat-di)
     * [0x92 - Multiplication double tmpVarDouble DI](#0x92---multiplication-double-tmpvardouble-di)
     * [0x93 - Multiplication float tmpVarFloat SI](#0x93---multiplication-float-tmpvarfloat-si)
     * [0x94 - Multiplication double tmpVarDouble SI](#0x94---multiplication-double-tmpvardouble-si)
-    * [0x95 - Multiplication stack * temp var (float)](#0x95---multiplication-stack--temp-var-float)
+    * [0x95 - Multiplication stack * temp var (float) (3 param)](#0x95---multiplication-stack--temp-var-float-3-param)
+    * [0x96 - Multiplication stack * temp var (double) (3 param)](#0x96---multiplication-stack--temp-var-double-3-param)
     * [0x97 - Subtraction (float)](#0x97---subtraction-float)
     * [0x98 - Subtraction (double)](#0x98---subtraction-double)
     * [0x99 - Subtraction temp var - (float)](#0x99---subtraction-temp-var---float)
+    * [0x9A - Subtraction temp var - (double)](#0x9a---subtraction-temp-var---double)
     * [0x9B - Subtraction (float) - temp var](#0x9b---subtraction-float---temp-var)
-    * [0x9C - ?? subtract double - temp var (float)](#0x9c----subtract-double---temp-var-float)
-    * [0x9D - Subtract tmpVarFloat from floatStackValue](#0x9d---subtract-tmpvarfloat-from-floatstackvalue)
-    * [0x9E - Subtract tmpVarFloat from doubleStackValue](#0x9e---subtract-tmpvarfloat-from-doublestackvalue)
+    * [0x9C - Subtraction (double) - temp var](#0x9c---subtraction-double---temp-var)
+    * [0x9D - Subtract tmpVarFloat from floatStackValue (3 param)](#0x9d---subtract-tmpvarfloat-from-floatstackvalue-3-param)
+    * [0x9E - Subtract tmpVarFloat from doubleStackValue (3 param)](#0x9e---subtract-tmpvarfloat-from-doublestackvalue-3-param)
     * [0x9F - compare floats](#0x9f---compare-floats)
     * [0xA0 - compare doubles](#0xa0---compare-doubles)
     * [0xA1 - compare float to temp var](#0xa1---compare-float-to-temp-var)
     * [0xA2 - compare double to temp var](#0xa2---compare-double-to-temp-var)
     * [0xA5 - Compare tmpVarFloat and stack float value](#0xa5---compare-tmpvarfloat-and-stack-float-value)
     * [0xA7 - compare float with zero](#0xa7---compare-float-with-zero)
+    * [0xA8 - compare double with zero](#0xa8---compare-double-with-zero)
     * [0xA9 - compare tmpVarFloat with zero](#0xa9---compare-tmpvarfloat-with-zero)
+    * [0xAA - compare tmpVarDouble with zero](#0xaa---compare-tmpvardouble-with-zero)
     * [0xAB - multiply float by power of 2](#0xab---multiply-float-by-power-of-2)
+    * [0xAC - multiply double by power of 2](#0xac---multiply-double-by-power-of-2)
     * [0xAD - multiply tmpVarFloat by power of 2](#0xad---multiply-tmpvarfloat-by-power-of-2)
+    * [0xAE - multiply tmpVarDouble by power of 2](#0xae---multiply-tmpvardouble-by-power-of-2)
     * [0xAF - float negation](#0xaf---float-negation)
-    * [0x80 - double negation](#0x80---double-negation)
+    * [0xB0 - double negation](#0xb0---double-negation)
     * [0xB3 - ?? FIELD start maybe](#0xb3----field-start-maybe)
     * [0xB4 - FIELD var](#0xb4---field-var)
     * [0xB5 - INPUT from keyboard](#0xb5---input-from-keyboard)
@@ -593,8 +624,26 @@ Return:
 
     BX - position integer value
 
+### 0x22 - INT (integer)
+Returns the integer portion of a numeric expression. Result stored in internal integer.
+
+Input:
+
+    BX - integer value
+
+Return:
+
+    BX - integer value
+
 ### 0x23 - DATE$
 Loads system date into internal string. Date is in the format "MM-DD-YYYY"
+
+### 0x24 - TIME$
+Loads system time into internal string. Time is in the format "HH:MM:SS"
+
+Return:
+
+    BX - pointer to string
 
 ### 0x25 - CSRLIN
 Line Position of Cursor.
@@ -722,6 +771,12 @@ Input:
 ### 0x34 - RND
 Return next random number into temp var as float
 
+### 0x35 - ATN
+Calculate arctangent and store internally. Result stored in temp var as float.
+
+Input:
+    BX - angle in radians - pointer to float
+
 ### 0x36 - COS
 Calculate cosine and store internally
 
@@ -737,6 +792,36 @@ Input:
 
     BX - numexpr - pointer to float
 
+### 0x38 - LOG
+Calculate natural logarithm and store internally. Result stored in temp var as float.
+
+Input:
+    BX - numexpr - pointer to float
+
+### 0x39 - SIN
+Calculate sine and store internally. Result stored in temp var as float.
+
+Input:
+    BX - angle in radians - pointer to float
+
+### 0x3A - SQR
+Calculate square root and store internally. Result stored in temp var as float.
+
+Input:
+    BX - numexpr - pointer to float
+
+### 0x3B - TAN
+Calculate tangent and store internally. Result stored in temp var as float.
+
+Input:
+    BX - angle in radians - pointer to float
+
+### 0x3C - ATN (double)
+Calculate arctangent and store internally. Result stored in temp var as double.
+
+Input:
+    BX - angle in radians - pointer to double
+
 ### 0x3D - COS (double)
 Calculate cosine and store internally
 
@@ -751,6 +836,30 @@ Pushes result to stack
 Input:
 
     BX - numexpr - pointer to double
+
+### 0x3F - LOG (double)
+Calculate natural logarithm and store internally. Result stored in temp var as double.
+
+Input:
+    BX - numexpr - pointer to double
+
+### 0x40 - SIN (double)
+Calculate sine and store internally. Result stored in temp var as double.
+
+Input:
+    BX - angle in radians - pointer to double
+
+### 0x41 - SQR (double)
+Calculate square root and store internally. Result stored in temp var as double.
+
+Input:
+    BX - numexpr - pointer to double
+
+### 0x42 - TAN (double)
+Calculate tangent and store internally. Result stored in temp var as double.
+
+Input:
+    BX - angle in radians - pointer to double
 
 ### 0x43 - TIMER
 Loads number of seconds since midnight into temp var DS:1A as integer value
@@ -923,6 +1032,13 @@ Set the system date
 Input:
 
     BX - newdate - pointer to string containing new date in format "MM-DD-YYYY" or "MM-DD-YY"
+
+### 0x18 - TIME$ (write)
+Set the system time
+
+Input:
+
+    BX - newtime - pointer to string containing new time in format "HH:MM:SS"
 
 
 ### 0x19 - BLOAD (offset from file)
@@ -1542,6 +1658,14 @@ Return:
 
     BX - boolean integer value. True = -1, False = 0
 
+### 0x20 - tmpVarDouble to boolean
+Convert tmpVarDouble to boolean.
+0 = false any other value = true
+
+Return:
+
+    BX - boolean integer value. True = -1, False = 0
+
 ### 0x21 - ?? push float to stack
 Push float onto stack. Seen in `DEF SEG = nnnn` where nnnn is a float
 ```asm
@@ -1570,6 +1694,20 @@ Input:
 
     SI - double - base
     DI - double - power
+
+### 0x25 - Exponentiation Operator using tempFloatVar (float)
+The ^ operator performs exponentiation using tempFloatVar. Result is stored in temp var.
+
+Input:
+
+    DI - float - power (tempFloatVar is the base)
+
+### 0x26 - Exponentiation Operator using tempDoubleVar (double)
+The ^ operator performs exponentiation using tempDoubleVar. Result is stored in temp var.
+
+Input:
+
+    DI - double - power (tempDoubleVar is the base)
 
 ### 0x2B - ABS (float)
 Absolute value of float. Result stored in temp var
@@ -1612,6 +1750,26 @@ Sign of double value. Stored in temp var.
 Input:
 
     SI - double - pointer to double
+
+### 0x31 - SGN (float) temp var
+Sign of float value in temp var. Result stored in temp var.
+
+1 if positive
+0 if 0
+-1 if negative
+
+### 0x32 - SGN (double) temp var
+Sign of double value in temp var. Result stored in temp var.
+
+1 if positive
+0 if 0
+-1 if negative
+
+### 0x39 - start function
+Marks the start of a function. Used for DEF FN functions.
+
+### 0x3A - end function
+Marks the end of a function. Used for DEF FN functions.
 
 ### 0x43 - DIM (dynamic float)
 Create dynamic array
@@ -1781,8 +1939,13 @@ Return:
 
     BX - pointer to newly concatenated string
 
-### 0x56 - ?? used in b# = CDBL(a%)
-Integer value pointer in BX
+### 0x56 - store int as double in temp var
+Convert integer value to double and store it in temp storage at DS:16
+Used for CDBL(integer expression)
+
+Input:
+
+    BX - integer value
 
 ### 0x57 - store int as float in temp var
 Convert integer value to float and store it in temp storage at DS:1A
@@ -1956,10 +2119,13 @@ Input:
 
     SI - pointer to float value
 
-### 0x71 - Push float temp var onto stack
-I think this pushes the current value of temp var onto a stack
-has a second byte operand which appears to start at 0x80 and increment with each
-invocation. arithmetic operations seem to also have this same value.
+### 0x71 - Push float temp var onto stack (3 param)
+Pushes the current value of float temp var onto a stack.
+Has a second byte operand which appears to start at 0x80 and increment with each invocation.
+
+### 0x72 - Push double temp var onto stack (3 param)
+Pushes the current value of double temp var onto a stack.
+Has a second byte operand which appears to start at 0x80 and increment with each invocation.
 
 ### 0x74 - ?? convert float temp var to double temp var
 
@@ -2073,7 +2239,7 @@ Input:
 
     DI - float - pointer to float to be added.
 
-### 0x82 - Addition temp var + (double)
+### 0x82 - Addition temp var + DI (double)
 Add double to temp var storing result in temp var
 
 Input:
@@ -2087,7 +2253,18 @@ Input:
 
     SI - float - pointer to float to be added.
 
-### 0x85 - Addition stack + temp var (float)
+### 0x84 - Addition temp var + SI (double)
+Add double to temp var storing result in temp var
+
+Input:
+
+    SI - double - pointer to double to be added.
+
+### 0x85 - Addition stack + temp var (float) (3 param)
+Has second byte seems to start at 0x80 and increment for each call to op
+Result of addition is stored in temp var
+
+### 0x86 - Addition stack + temp var (double) (3 param)
 Has second byte seems to start at 0x80 and increment for each call to op
 Result of addition is stored in temp var
 
@@ -2115,12 +2292,26 @@ Input:
 
     DI - float - pointer to float to divide by
 
-### 0x8B - Division tmpVarFloat by float SI
-divide tmpVarFloat by float storing result in tmpVarFloat
+### 0x8A - Division tmpVarDouble by double DI
+divide tmpVarDouble by double storing result in tmpVarDouble
 
 Input:
 
-    SI - float - pointer to float to divide by
+    DI - double - pointer to double to divide by
+
+### 0x8B - Division float SI by tmpVarFloat
+divide float by tmpVarFloat storing result in tmpVarFloat
+
+Input:
+
+    SI - float - pointer to float to divide
+
+### 0x8C - Division double SI by tmpVarDouble
+divide double by tmpVarDouble storing result in tmpVarDouble
+
+Input:
+
+    SI - double - pointer to double to divide
 
 ### 0x8f - Multiplication (float)
 Multiply two floats together and push result to stack
@@ -2166,7 +2357,11 @@ Input:
 
     SI - double - pointer to double
 
-### 0x95 - Multiplication stack * temp var (float)
+### 0x95 - Multiplication stack * temp var (float) (3 param)
+Has second byte seems to start at 0x80 and increment for each call to op
+Result of multiplication is stored in temp var
+
+### 0x96 - Multiplication stack * temp var (double) (3 param)
 Has second byte seems to start at 0x80 and increment for each call to op
 Result of multiplication is stored in temp var
 
@@ -2193,6 +2388,13 @@ Input:
 
     DI - float - pointer to float to subtract.
 
+### 0x9A - Subtraction temp var - (double)
+Subtract double from temp var storing result in temp var
+
+Input:
+
+    DI - double - pointer to double to subtract.
+
 ### 0x9B - Subtraction (float) - temp var
 Subtract temp var from float storing result in temp var
 
@@ -2200,16 +2402,18 @@ Input:
 
     SI - float - pointer to float to subtracted from.
 
-### 0x9C - ?? subtract double - temp var (float)
-`tmpVarFloat = d - tmpVarFloat`
+### 0x9C - Subtraction (double) - temp var
+Subtract temp var from double storing result in temp var
 
 Input:
 
-    SI - d - pointer to double
+    SI - double - pointer to double to subtract from.
 
-### 0x9D - Subtract tmpVarFloat from floatStackValue
+### 0x9D - Subtract tmpVarFloat from floatStackValue (3 param)
+Has second byte operand which starts at 0x80 and increments.
 
-### 0x9E - Subtract tmpVarFloat from doubleStackValue
+### 0x9E - Subtract tmpVarFloat from doubleStackValue (3 param)
+Has second byte operand which starts at 0x80 and increments.
 `tmpVarDouble = doubleStackVal - tmpVarFloat`
 
 ### 0x9F - compare floats
@@ -2289,8 +2493,18 @@ Input:
 
     SI - float - pointer to float
 
+### 0xA8 - compare double with zero
+Compare double variable with zero and set zero flag accordingly
+
+Input:
+
+    SI - double - pointer to double
+
 ### 0xA9 - compare tmpVarFloat with zero
 Compare tmpFloatValue with zero and set flags accordingly
+
+### 0xAA - compare tmpVarDouble with zero
+Compare tmpDoubleValue with zero and set flags accordingly
 
 ### 0xAB - multiply float by power of 2
 Multiply float by power of 2 (2 byte command) push resulting float to stack
@@ -2308,6 +2522,14 @@ Input:
     SI - pointer to float to multiply
     Second command byte - number of power to multiply by. eg 3 for 2^3 multiply by 8
 
+### 0xAC - multiply double by power of 2
+Multiply double by power of 2 (2 byte command) push resulting double to stack
+
+Input:
+
+    SI - pointer to double to multiply
+    Second command byte - number of power to multiply by. eg 3 for 2^3 multiply by 8
+
 ### 0xAD - multiply tmpVarFloat by power of 2
 `tmpVarFloat = tempVarFloat * 2^n`
 n is supplied in command operand
@@ -2322,6 +2544,10 @@ eg. `TIMER * 16`
        1000:00aa 04              ??         04h
 ```
 
+### 0xAE - multiply tmpVarDouble by power of 2
+`tmpVarDouble = tempVarDouble * 2^n`
+n is supplied in command operand
+
 ### 0xAF - float negation
 Store negation of float in temp var
 
@@ -2329,7 +2555,7 @@ Input:
 
     SI - float - pointer to float to negate.
 
-### 0x80 - double negation
+### 0xB0 - double negation
 Store negation of double in temp var
 
 Input:
