@@ -106,10 +106,14 @@
     * [0x26 - GET](#0x26---get)
     * [0x28 - PUT (File IO)](#0x28---put-file-io)
     * [0x2B - BEEP](#0x2b---beep)
+    * [0x2F - CIRCLE (start angle)](#0x2f---circle-start-angle)
+    * [0x30 - CIRCLE (end angle)](#0x30---circle-end-angle)
+    * [0x31 - CIRCLE (aspect ratio)](#0x31---circle-aspect-ratio)
     * [0x32 - CLS](#0x32---cls-)
     * [0x33 - Add argument to COLOR command](#0x33---add-argument-to-color-command)
     * [0x35 - COLOR](#0x35---color)
     * [0x36 - DRAW](#0x36---draw)
+    * [0x3A - GET (gfx)](#0x3a---get-gfx)
     * [0x3B - STEP ??](#0x3b---step-)
     * [0x3C - KEY on/off/list](#0x3c---key-onofflist)
     * [0x3D - KEY](#0x3d---key)
@@ -127,6 +131,8 @@
     * [0x5B - SCREEN](#0x5b---screen)
     * [0x5C - STRIG ON](#0x5c---strig-on)
     * [0x5D - STRIG OFF](#0x5d---strig-off)
+    * [0x5E - SOUND](#0x5e---sound)
+    * [0x5F - SOUND (finished?)](#0x5f---sound-finished)
     * [0x64 - COM(n) ON](#0x64---comn-on)
     * [0x65 - COM(n) OFF](#0x65---comn-off)
     * [0x66 - COM(n) STOP](#0x66---comn-stop)
@@ -143,6 +149,8 @@
     * [0x84 - LINE (start position)](#0x84---line-start-position)
     * [0x85 - LINE (end position)](#0x85---line-end-position)
     * [0x86 - LINE](#0x86---line)
+    * [0x87 - GET (start position)](#0x87---get-start-position)
+    * [0x88 - GET (end position)](#0x88---get-end-position)
     * [0x89 - PUT (position)](#0x89---put-position)
     * [0x8A - PRESET](#0x8a---preset)
     * [0x8C - CIRCLE](#0x8c---circle)
@@ -182,6 +190,7 @@
     * [0x30 - SGN (double)](#0x30---sgn-double)
     * [0x31 - SGN (float) temp var](#0x31---sgn-float-temp-var)
     * [0x32 - SGN (double) temp var](#0x32---sgn-double-temp-var)
+    * [0x35 - SPC](#0x35---spc)
     * [0x39 - start function](#0x39---start-function)
     * [0x3A - end function](#0x3a---end-function)
     * [0x43 - DIM (dynamic float)](#0x43---dim-dynamic-float)
@@ -781,6 +790,7 @@ Input:
 Calculate cosine and store internally
 
 Input:
+
     BX - angle in radians - pointer to float
 
 ### 0x37 - EXP
@@ -826,7 +836,8 @@ Input:
 Calculate cosine and store internally
 
 Input:
-BX - angle in radians - pointer to double
+
+    BX - angle in radians - pointer to double
 
 ### 0x3E - EXP (double)
 Returns e (the base of natural logarithms) to the power of supplied numexpr.
@@ -1079,7 +1090,9 @@ Displays a directory listing of current working directory.
 Open a file or device for input/output
 
 *TODO* figure out all the arguments
+
 Input:
+
     BX - fileNum - integer
     DX - filename - pointer to string filename
     CX - length - integer
@@ -1160,6 +1173,30 @@ Input:
 Sounds the speaker at 800 Hz for a quarter of a second (equivalent to
 `PRINT CHR$(7)`).
 
+### 0x2F - CIRCLE (start angle)
+Starting angle of arc, in radians. Defaults to 0.
+
+Input:
+
+    BX - pointer to float containing angle
+
+### 0x30 - CIRCLE (end angle)
+Ending angle of arc, in radians. Defaults to 2.
+
+Input:
+
+    BX - pointer to float containing angle
+
+
+### 0x31 - CIRCLE (aspect ratio)
+Ratio, in pixels, of the x radius to the y radius.
+Defaults to 5/6 in medium resolution, 5/12 in high
+resolution; these values generate a circle on the CGA.
+
+Input:
+
+    BX - pointer to float containing ratio
+
 ### 0x32 - CLS 
 Clear screen
 
@@ -1186,6 +1223,28 @@ eg. `DRAW "R10 D10 R20"`
 Input:
 
     BX - drawInstructions - string pointer to draw instructions
+### 0x3A - GET (gfx)
+Read pixels from screen into an array.
+
+`DX` seems to be set to a value. Maybe size of array??
+
+eg.
+```asm
+       1000:1c7d bb  30  00       MOV        BX ,0x30
+       1000:1c80 ba  08  00       MOV        DX ,0x8
+       1000:1c83 33  c9           XOR        CX ,CX
+       1000:1c85 8b  c1           MOV        AX ,CX
+       1000:1c87 cd  3e  87       INTB3E     0x87                      INT_3E_87_GET_START_POS
+       1000:1c8a bb  dc  00       MOV        BX ,0xdc
+       1000:1c8d ba  0f  00       MOV        DX ,0xf
+       1000:1c90 cd  3e  88       INTB3E     0x88                      INT_3E_88_GET_END_POS
+       1000:1c93 bb  26  49       MOV        BX ,0x4926
+       1000:1c96 ba  46  06       MOV        DX ,0x646
+       1000:1c99 cd  3e  3a       INTB3E     0x3a                      INT_3E_3A_GET_GFX
+```
+Input:
+
+    BX - pointer array to store graphics
 
 ### 0x3B - STEP ??
 Seems to indicate the STEP instruction in a line statement.
@@ -1304,6 +1363,20 @@ Disable the STRIG Function. Has unknown second command byte.
        1000:0051 5d              db         5Dh
        1000:0052 cc              ??         CCh
 ```
+
+### 0x5E - SOUND
+Sound the Speaker
+`SOUND freq,duration`
+
+Input:
+
+    BX - freq - integer value. In range 37 to 32767
+    DX - duration - pointer to float value. In range 0 to 65535
+
+### 0x5F - SOUND (finished?)
+Seems to be called immediately after `SOUND` opcode. Maybe queuing sound?
+
+`BX` and `DX` both seem to be set to `0xFFFF`
 
 ### 0x64 - COM(n) ON
 Enable COM port n
@@ -1433,6 +1506,32 @@ Input:
          0 for rectangle with border,
          1 for rectangle filled
 
+### 0x87 - GET (start position)
+x1,y1    Upper left corner of the rectangle to be copied
+
+Seems to also set `AX` and `CX` registers.
+Seem to be `0`
+eg.
+```asm
+       1000:1c7d bb  30  00       MOV        BX ,0x30
+       1000:1c80 ba  08  00       MOV        DX ,0x8
+       1000:1c83 33  c9           XOR        CX ,CX
+       1000:1c85 8b  c1           MOV        AX ,CX
+       1000:1c87 cd  3e  87       INTB3E     0x87      INT_3E_87_GET_START_POS
+```
+Input:
+
+    BX - x1 - integer value
+    DX - y1 - integer value
+
+### 0x88 - GET (end position)
+x2,y2    Lower right corner of the rectangle to be copied
+
+Input:
+
+    BX - x2 - integer value
+    DX - y2 - integer value
+
 ### 0x89 - PUT (position)
 x, y position for top left corner of destination for pixel copy
 
@@ -1450,16 +1549,13 @@ Input:
     BX - color
 
 ### 0x8C - CIRCLE
-`CIRCLE [STEP] (x,y), radius [,[color] [,[start],[end][,aspect]]]`
-
 Draws an ellipse on the screen.
-(x, y) seems to be set using INT 0x3E 0x8D 
-
-*TODO* Investigate optional arguments
+`CIRCLE [STEP] (x,y), radius [,[color] [,[start],[end][,aspect]]]`
 
 Input:
 
     BX - radius - pointer to float
+    DX - color - integer value. 0xffff for default if color arg not supplied.
 
 ### 0x8D - set point (x, y)
 
@@ -1764,6 +1860,14 @@ Sign of double value in temp var. Result stored in temp var.
 1 if positive
 0 if 0
 -1 if negative
+
+### 0x35 - SPC
+Skip n Spaces in a PRINT statement
+`PRINT SPC(n)`
+
+Input:
+
+    BX - n -integer value. Number of spaces to skip.
 
 ### 0x39 - start function
 Marks the start of a function. Used for DEF FN functions.

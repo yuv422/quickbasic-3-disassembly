@@ -1,10 +1,11 @@
+import generic.stl.Pair;
 import ghidra.app.script.GhidraScript;
 import ghidra.framework.store.LockException;
 import ghidra.program.database.function.OverlappingFunctionException;
 import ghidra.program.disassemble.Disassembler;
 import ghidra.program.disassemble.DisassemblerMessageListener;
 import ghidra.program.model.address.*;
-import ghidra.program.model.data.DataType;
+import ghidra.program.model.data.*;
 import ghidra.program.model.listing.*;
 import ghidra.program.model.mem.MemoryAccessException;
 import ghidra.program.model.mem.MemoryConflictException;
@@ -13,6 +14,7 @@ import ghidra.program.model.symbol.RefType;
 import ghidra.program.model.symbol.SourceType;
 import ghidra.program.model.util.CodeUnitInsertionException;
 import ghidra.util.exception.CancelledException;
+import ghidra.util.exception.DuplicateNameException;
 import ghidra.util.exception.InvalidInputException;
 import ghidra.util.task.ConsoleTaskMonitor;
 
@@ -30,7 +32,7 @@ public class QuickBasic3Disassembler extends GhidraScript {
     protected void run() throws Exception {
         byteDataType = currentProgram.getDataTypeManager().getDataType("/byte");
         if (byteDataType == null) {
-            byteDataType = currentProgram.getDataTypeManager().getAllDataTypes().next();
+            byteDataType = ByteDataType.dataType;
         }
         wordDataType = currentProgram.getDataTypeManager().getDataType("/word");
         if (wordDataType == null) {
@@ -40,6 +42,9 @@ public class QuickBasic3Disassembler extends GhidraScript {
         createBrun30Segments(currentAddr);
 
         printf("min address = %s %s\n", currentAddr.toString(), byteDataType.getDataTypePath());
+        if (getInstructionAt(currentAddr) != null) {
+            currentAddr = currentAddress;
+        }
         Disassembler disassembler = Disassembler.getDisassembler(currentProgram, new ConsoleTaskMonitor(), DisassemblerMessageListener.CONSOLE);
 
         disassembleFlow(currentAddr, disassembler);
@@ -180,31 +185,80 @@ public class QuickBasic3Disassembler extends GhidraScript {
         return a;
     }
 
-    void createBrun30Segments(Address currentAddr) throws AddressOverflowException, LockException, CancelledException, MemoryConflictException, InvalidInputException, OverlappingFunctionException {
-        createSegment("BRun30Int3D", 0x9000, currentAddress, Arrays.stream(Int3DEnum.values()).map(Enum::name).toList());
-        createSegment("BRun30Int3E", 0x9010, currentAddress, Arrays.stream(Int3EEnum.values()).map(Enum::name).toList());
-        createSegment("BRun30Int3F", 0x9020, currentAddress, Arrays.stream(Int3FEnum.values()).map(Enum::name).toList());
+    void createBrun30Segments(Address currentAddr) throws AddressOverflowException, LockException, CancelledException, MemoryConflictException, InvalidInputException, OverlappingFunctionException, DuplicateNameException {
+        createSegment("BRun30Int3D", 0x9000, currentAddress, Arrays.stream(Int3DEnum.values()).map(it -> new Pair<>(it.name(), it.funcSignature)).toList());
+        createSegment("BRun30Int3E", 0x9010, currentAddress, Arrays.stream(Int3EEnum.values()).map(it -> new Pair<>(it.name(), it.funcSignature)).toList());
+        createSegment("BRun30Int3F", 0x9020, currentAddress, Arrays.stream(Int3FEnum.values()).map(it -> new Pair<>(it.name(), it.funcSignature)).toList());
     }
 
-    void createSegment(String name, int segment, Address currentAddress, List<String> opNames) throws AddressOverflowException, LockException, CancelledException, MemoryConflictException, InvalidInputException, OverlappingFunctionException {
+    void createSegment(String name, int segment, Address currentAddress, List<Pair<String, FuncSignature>> funcs) throws AddressOverflowException, LockException, CancelledException, MemoryConflictException, InvalidInputException, OverlappingFunctionException, DuplicateNameException {
         if (currentProgram.getMemory().getBlock(name) == null) {
             currentProgram.getMemory().createInitializedBlock(
                     name,
                     (Address)((SegmentedAddressSpace)currentAddress.getAddressSpace()).getAddress(segment, 0),
                     256L,
-                    (byte)0xCB,
+                    (byte)0xCB, // RETF
                     null,
                     false
             );
         }
 
-        for (int i = 0; i < opNames.size(); i++) {
-            String opName = opNames.get(i);
+        for (int i = 0; i < funcs.size(); i++) {
+            String opName = funcs.get(i).first;
+            FuncSignature sig = funcs.get(i).second;
             Address funcAddress = ((SegmentedAddressSpace)currentAddress.getAddressSpace()).getAddress(segment, i+1);
             if (currentProgram.getFunctionManager().getFunctionAt(funcAddress) != null) {
                 currentProgram.getFunctionManager().removeFunction(funcAddress);
             }
             currentProgram.getFunctionManager().createFunction(opName, funcAddress, new AddressSet(funcAddress), SourceType.USER_DEFINED);
+            applyFuncSignature(currentProgram.getFunctionManager().getFunctionAt(funcAddress), sig);
         }
+    }
+
+    public void applyFuncSignature(Function function, FuncSignature funcSignature) throws InvalidInputException, DuplicateNameException {
+        List<Variable> funcVars = funcSignature.args().stream().map( arg -> {
+            final DataType dt = getDataType(arg.type());
+            try {
+                Variable p = new ParameterImpl(
+                        arg.name(),
+                        dt,
+                        new VariableStorage(currentProgram.getDataTypeManager().getProgramArchitecture(), currentProgram.getProgramContext().getRegister(arg.type().reg().name())),
+                        currentProgram);
+                return p;
+            } catch (InvalidInputException e) {
+                throw new RuntimeException(e);
+            }
+        }).toList();
+
+
+        function.updateFunction(null, getReturnVar(funcSignature.returnType()), funcVars, Function.FunctionUpdateType.CUSTOM_STORAGE, true, SourceType.USER_DEFINED);
+    }
+
+    Variable getReturnVar(RegWithType type) throws InvalidInputException {
+        if (type == null) return new ReturnParameterImpl(VoidDataType.dataType, currentProgram);
+
+        return new ReturnParameterImpl(getDataType(type), currentProgram.getProgramContext().getRegister(type.reg().name()), currentProgram);
+    }
+
+    DataType getDataType(RegWithType type) {
+        switch (type.type()) {
+            case Int -> {
+                return  WordDataType.dataType;
+            }
+            case IntPtr -> {
+                return  Pointer16DataType.getPointer(WordDataType.dataType, 2);
+            }
+            case Float -> {
+                return Pointer16DataType.getPointer(Float4DataType.dataType, 2);
+            }
+            case Double -> {
+                return Pointer16DataType.getPointer(Float8DataType.dataType, 2);
+            }
+            case Str -> {
+                return Pointer16DataType.getPointer(CharDataType.dataType, 2);
+            }
+        }
+
+        return null;
     }
 }

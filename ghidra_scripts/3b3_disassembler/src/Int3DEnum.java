@@ -1,9 +1,12 @@
+import java.util.List;
+
+//"BX:I:code #BX:S"
 public enum Int3DEnum {
-    INT_3D_1_FIX_FLOAT(0x1),
+    INT_3D_1_FIX_FLOAT(0x1, new FuncSignature(List.of(Arg.bxFloat("floatValue")))),
     INT_3D_2_FIX_DOUBLE(0x2),
     INT_3D_3_INT_FLOAT(0x3),
     INT_3D_4_INT_DOUBLE(0x4),
-    INT_3D_5_CHR$(0x5),
+    INT_3D_5_CHR$(0x5, new FuncSignature(List.of(Arg.bxInt("code")), RegWithType.bxString())),
     INT_3D_6_INKEY$(0x6),
     INT_3D_7_INPUT$(0x7),
     INT_3D_8_UNK(0x8),
@@ -32,9 +35,9 @@ public enum Int3DEnum {
     INT_3D_1F_ERR(0x1f),
     INT_3D_20_LPOS(0x20),
     INT_3D_21_UNK(0x21),
-    INT_3D_22_UNK(0x22),
+    INT_3D_22_INT(0x22),
     INT_3D_23_DATE$(0x23),
-    INT_3D_24_UNK(0x24),
+    INT_3D_24_TIME$(0x24),
     INT_3D_25_CSRLIN(0x25),
     INT_3D_26_UNK(0x26),
     INT_3D_27_POINT_ATTR(0x27),
@@ -51,20 +54,20 @@ public enum Int3DEnum {
     INT_3D_32_VARPTR_FILE(0x32),
     INT_3D_33_RND_N(0x33),
     INT_3D_34_RND(0x34),
-    INT_3D_35_UNK(0x35),
+    INT_3D_35_ATN(0x35),
     INT_3D_36_COS(0x36),
     INT_3D_37_EXP(0x37),
-    INT_3D_38_UNK(0x38),
-    INT_3D_39_UNK(0x39),
-    INT_3D_3A_UNK(0x3a),
-    INT_3D_3B_UNK(0x3b),
-    INT_3D_3C_UNK(0x3c),
+    INT_3D_38_LOG(0x38),
+    INT_3D_39_SIN(0x39),
+    INT_3D_3A_SQR(0x3a),
+    INT_3D_3B_TAN(0x3b),
+    INT_3D_3C_ATN_DOUBLE(0x3c),
     INT_3D_3D_COS_DOUBLE(0x3d),
     INT_3D_3E_EXP_DOUBLE(0x3e),
-    INT_3D_3F_UNK(0x3f),
-    INT_3D_40_UNK(0x40),
-    INT_3D_41_UNK(0x41),
-    INT_3D_42_UNK(0x42),
+    INT_3D_3F_LOG_DOUBLE(0x3f),
+    INT_3D_40_SIN_DOUBLE(0x40),
+    INT_3D_41_SQR_DOUBLE(0x41),
+    INT_3D_42_TAN_DOUBLE(0x42),
     INT_3D_43_TIMER(0x43),
     INT_3D_44_UNK(0x44),
     INT_3D_45_IOCTL$(0x45),
@@ -259,15 +262,24 @@ public enum Int3DEnum {
 
     public final int cmd;
     public final int cmdLength;
+    public final FuncSignature funcSignature;
 
     Int3DEnum(int cmd) {
         this.cmd = cmd;
         this.cmdLength = 1;
+        this.funcSignature = new FuncSignature();
     }
 
     Int3DEnum(int cmd, int cmdLength) {
         this.cmd = cmd;
         this.cmdLength = cmdLength;
+        this.funcSignature = new FuncSignature();
+    }
+
+    Int3DEnum(int cmd, FuncSignature funcSignature) {
+        this.cmd = cmd;
+        this.cmdLength = 1;
+        this.funcSignature = funcSignature;
     }
 
     public static Int3DEnum findByCmd(int cmd) {

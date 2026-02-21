@@ -1,3 +1,5 @@
+import java.util.List;
+
 public enum Int3FEnum {
     I3F_1_FIX(0x1),
     I3F_2_ON_ERROR(0x2),
@@ -30,13 +32,13 @@ public enum Int3FEnum {
     I3F_1D_FLOAT_TO_BOOL(0x1d),
     I3F_1E_DOUBLE_TO_BOOL(0x1e),
     I3F_1F_TMP_VAR_FLOAT_TO_BOOL(0x1f),
-    I3F_20_UNK(0x20),
+    I3F_20_TMP_VAR_DOUBLE_TO_BOOL(0x20),
     I3F_21_PUSH_FLOAT(0x21),
     I3F_22_UNK(0x22),
     I3F_23_EXP_POW_FLOAT(0x23),
     I3F_24_EXP_POW_DOUBLE(0x24),
-    I3F_25_UNK(0x25),
-    I3F_26_UNK(0x26),
+    I3F_25_TMP_VAR_EXP_POW_FLOAT(0x25),
+    I3F_26_TMP_VAR_EXP_POW_DOUBLE(0x26),
     I3F_27_UNK(0x27),
     I3F_28_UNK(0x28),
     I3F_29_UNK(0x29),
@@ -47,16 +49,16 @@ public enum Int3FEnum {
     I3F_2E_ABS_DOUBLE_TMP_VAR(0x2e),
     I3F_2F_SGN_FLOAT(0x2f),
     I3F_30_SGN_DOUBLE(0x30),
-    I3F_31_UNK(0x31),
-    I3F_32_UNK(0x32),
+    I3F_31_SGN_FLOAT_TMP_VAR(0x31),
+    I3F_32_SGN_DOUBLE_TMP_VAR(0x32),
     I3F_33_UNK(0x33),
     I3F_34_UNK(0x34),
-    I3F_35_UNK(0x35),
+    I3F_35_SPC(0x35),
     I3F_36_UNK(0x36),
     I3F_37_UNK(0x37),
     I3F_38_UNK(0x38),
-    I3F_39_UNK(0x39),
-    I3F_3A_UNK(0x3a),
+    I3F_39_DEF_FN_START(0x39),
+    I3F_3A__DEF_FN_END(0x3a),
     I3F_3B_UNK(0x3b),
     I3F_3C_UNK(0x3c),
     I3F_3D_UNK(0x3d),
@@ -84,7 +86,7 @@ public enum Int3FEnum {
     I3F_53_SUBROUTINE_START(0x53),
     I3F_54_SUBROUTINE_END(0x54),
     I3F_55_CONCAT_STR(0x55),
-    I3F_56_UNK(0x56),
+    I3F_56_STORE_INT_AS_DOUBLE_TMP(0x56),
     I3F_57_STORE_INT_AS_FLOAT_TMP(0x57),
     I3F_58_UNK(0x58),
     I3F_59_UNK(0x59),
@@ -95,7 +97,7 @@ public enum Int3FEnum {
     I3F_5E_ON_GOTO(0x5e),
     I3F_5F_UNK(0x5f),
     I3F_60_RETURN(0x60),
-    I3F_61_COPY_STR(0x61),
+    I3F_61_COPY_STR(0x61, new FuncSignature(List.of(Arg.dxString("dest"), Arg.bxString("src")), RegWithType.dxString())),
     I3F_62_COMPARE_STR(0x62),
     I3F_63_PRINT_FLOAT(0x63),
     I3F_64_PRINT_DOUBLE(0x64),
@@ -108,11 +110,11 @@ public enum Int3FEnum {
     I3F_6B_PRINT_FLOAT_NL(0x6b),
     I3F_6C_PRINT_DOUBLE_NL(0x6c),
     I3F_6D_PRINT_INT_NL(0x6d),
-    I3F_6E_PRINT_STR_NL(0x6e),
+    I3F_6E_PRINT_STR_NL(0x6e, new FuncSignature(List.of(Arg.bxString("str")))),
     I3F_6F_PUSH_FLOAT(0x6f),
     I3F_70_UNK(0x70),
-    I3F_71_PUSH_TMP_VAR_TO_STACK(0x71, 2),
-    I3F_72_UNK(0x72, 2),
+    I3F_71_PUSH_TMP_VAR_FLOAT_TO_STACK(0x71, 2),
+    I3F_72_PUSH_TMP_VAR_DOUBLE_TO_STACK(0x72, 2),
     I3F_73_LOAD_FLOAT_TO_DOUBLE_TEMP_VAR(0x73),
     I3F_74_UNK(0x74),
     I3F_75_CINT_FLOAT(0x75),
@@ -128,17 +130,17 @@ public enum Int3FEnum {
     I3F_7F_ADD_FLOAT(0x7f),
     I3F_80_ADD_DOUBLE(0x80),
     I3F_81_ADD_FLOAT_DI_TO_TMP_VAR(0x81),
-    I3F_82_ADD_DOUBLE_TO_TEMP(0x82),
+    I3F_82_ADD_DOUBLE_DI_TO_TMP_VAR(0x82),
     I3F_83_ADD_FLOAT_SI_TO_TMP_VAR(0x83),
-    I3F_84_UNK(0x84),
-    I3F_85_STACK_FLOAT_TMP_VAR(0x85, 2),
-    I3F_86_UNK(0x86),
+    I3F_84_ADD_DOUBLE_SI_TO_TMP_VAR(0x84),
+    I3F_85_ADD_STACK_FLOAT_TMP_VAR(0x85, 2),
+    I3F_86_ADD_STACK_DOUBLE_TMP_VAR(0x86),
     I3F_87_DIV_FLOAT(0x87),
     I3F_88_DIV_DOUBLE(0x88),
     I3F_89_DIV_TMP_VAR_FLOAT_DI(0x89),
-    I3F_8A_UNK(0x8a),
-    I3F_8B_DIV_TMP_VAR_FLOAT_SI(0x8b),
-    I3F_8C_UNK(0x8c),
+    I3F_8A_DIV_TMP_VAR_DOUBLE_DI(0x8a),
+    I3F_8B_DIV_FLOAT_SI_BY_TMP_VAR(0x8b),
+    I3F_8C_DIV_DOUBLE_SI_BY_TMP_VAR(0x8c),
     I3F_8D_UNK(0x8d),
     I3F_8E_UNK(0x8e),
     I3F_8F_MUL_FLOAT(0x8f),
@@ -148,13 +150,13 @@ public enum Int3FEnum {
     I3F_93_MUL_FLOAT_SI_TMP_VAR(0x93),
     I3F_94_MUL_DOUBLE_SI_TMP_VAR(0x94),
     I3F_95_MUL_STACK_FLOAT_TMP_VAR(0x95, 2),
-    I3F_96_UNK(0x96),
+    I3F_96_MUL_STACK_DOUBLE_TMP_VAR(0x96),
     I3F_97_SUBTRACT_FLOAT(0x97),
     I3F_98_SUBTRACT_DOUBLE(0x98),
     I3F_99_SUBTRACT_TMP_VAR_FLOAT(0x99),
-    I3F_9A_UNK(0x9a),
+    I3F_9A_SUBTRACT_TMP_VAR_DOUBLE(0x9a),
     I3F_9B_SUBTRACT_FLOAT_TMP_VAR(0x9b),
-    I3F_9C_UNK(0x9c),
+    I3F_9C_SUBTRACT_DOUBLE_TMP_VAR(0x9c),
     I3F_9D_SUBTRACT_STACK_FLOAT_TMP_VAR(0x9d, 2),
     I3F_9E_SUBTRACT_STACK_DOUBLE_TMP_VAR(0x9e, 2),
     I3F_9F_COMPARE_FLOAT(0x9f),
@@ -166,11 +168,11 @@ public enum Int3FEnum {
     I3F_A5_COMPARE_FLOAT_TMP_VAR_STACK(0xa5, 2),
     I3F_A6_UNK(0xa6, 2),
     I3F_A7_COMPARE_FLOAT_ZERO(0xa7),
-    I3F_A8_UNK(0xa8),
-    I3F_A9_COMPARE_TMP_VAR_ZERO(0xa9),
-    I3F_AA_UNK(0xaa),
+    I3F_A8_COMPARE_DOUBLE_ZERO(0xa8),
+    I3F_A9_COMPARE_FLOAT_TMP_VAR_ZERO(0xa9),
+    I3F_AA_COMPARE_DOUBLE_TMP_VAR_ZERO(0xaa),
     I3F_AB_MUL_POWER_OF_2_FLOAT(0xab, 2),
-    I3F_AC_UNK(0xac),
+    I3F_AC_MUL_POWER_OF_2_DOUBLE(0xac),
     I3F_AD_MUL_TMP_VAR_POWER_OF_2_FLOAT(0xad, 2),
     I3F_AE_MUL_POWER_OF_2_DOUBLE(0xae, 2),
     I3F_AF_NEG_FLOAT(0xaf),
@@ -259,15 +261,24 @@ public enum Int3FEnum {
 
     public final int cmd;
     public final int cmdLength;
+    public final FuncSignature funcSignature;
 
     Int3FEnum(int cmd) {
         this.cmd = cmd;
         this.cmdLength = 1;
+        this.funcSignature = new FuncSignature();
     }
 
     Int3FEnum(int cmd, int cmdLength) {
         this.cmd = cmd;
         this.cmdLength = cmdLength;
+        this.funcSignature = new FuncSignature();
+    }
+
+    Int3FEnum(int cmd, FuncSignature funcSig) {
+        this.cmd = cmd;
+        this.cmdLength = 1;
+        this.funcSignature = funcSig;
     }
 
     public static Int3FEnum findByCmd(int cmd) {

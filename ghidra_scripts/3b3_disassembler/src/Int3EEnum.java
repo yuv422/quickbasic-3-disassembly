@@ -22,7 +22,7 @@ public enum Int3EEnum {
     INT_3E_15_DEF_SEG(0x15),
     INT_3E_16_UNK(0x16),
     INT_3E_17_DATE$_WRITE(0x17),
-    INT_3E_18_UNK(0x18),
+    INT_3E_18_TIME$_WRITE(0x18),
     INT_3E_19_BLOAD_NO_ARGS(0x19),
     INT_3E_1A_BLOAD(0x1a),
     INT_3E_1B_BSAVE(0x1b),
@@ -45,9 +45,9 @@ public enum Int3EEnum {
     INT_3E_2C_UNK(0x2c),
     INT_3E_2D_UNK(0x2d),
     INT_3E_2E_UNK(0x2e),
-    INT_3E_2F_UNK(0x2f),
-    INT_3E_30_UNK(0x30),
-    INT_3E_31_UNK(0x31),
+    INT_3E_2F_CIRCLE_START_ANGLE(0x2f),
+    INT_3E_30_CIRCLE_END_ANGLE(0x30),
+    INT_3E_31_CIRCLE_ASPECT_RATIO(0x31),
     INT_3E_32_CLS(0x32),
     INT_3E_33_COLOR_CMD_ARG(0x33),
     INT_3E_34_UNK(0x34),
@@ -56,7 +56,7 @@ public enum Int3EEnum {
     INT_3E_37_UNK(0x37),
     INT_3E_38_UNK(0x38),
     INT_3E_39_UNK(0x39),
-    INT_3E_3A_UNK(0x3a),
+    INT_3E_3A_GET_GFX(0x3a),
     INT_3E_3B_STEP(0x3b),
     INT_3E_3C_KEY_DISP_CMD(0x3c),
     INT_3E_3D_KEY(0x3d),
@@ -92,8 +92,8 @@ public enum Int3EEnum {
     INT_3E_5B_SCREEN(0x5b),
     INT_3E_5C_STRIG_ON(0x5c),
     INT_3E_5D_STRIG_OFF(0x5d, 2),
-    INT_3E_5E_UNK(0x5e),
-    INT_3E_5F_UNK(0x5f),
+    INT_3E_5E_SOUND(0x5e),
+    INT_3E_5F_SOUND_STOP(0x5f),
     INT_3E_60_UNK(0x60),
     INT_3E_61_UNK(0x61),
     INT_3E_62_UNK(0x62),
@@ -133,8 +133,8 @@ public enum Int3EEnum {
     INT_3E_84_LINE_START_POS(0x84),
     INT_3E_85_LINE_END_POS(0x85),
     INT_3E_86_LINE(0x86),
-    INT_3E_87_UNK(0x87),
-    INT_3E_88_UNK(0x88),
+    INT_3E_87_GET_START_POS(0x87),
+    INT_3E_88_GET_END_POS(0x88),
     INT_3E_89_PUT_POS(0x89),
     INT_3E_8A_PRESET(0x8a),
     INT_3E_8B_UNK(0x8b),
@@ -259,15 +259,18 @@ public enum Int3EEnum {
 
     public final int cmd;
     public final int cmdLength;
+    public final FuncSignature funcSignature;
 
     Int3EEnum(int cmd) {
         this.cmd = cmd;
         this.cmdLength = 1;
+        this.funcSignature = new FuncSignature();
     }
 
     Int3EEnum(int cmd, int cmdLength) {
         this.cmd = cmd;
         this.cmdLength = cmdLength;
+        this.funcSignature = new FuncSignature();
     }
 
     public static Int3EEnum findByCmd(int cmd) {
