@@ -34,7 +34,7 @@ public enum Int3DEnum {
     INT_3D_1E_ERL(0x1e),
     INT_3D_1F_ERR(0x1f),
     INT_3D_20_LPOS(0x20),
-    INT_3D_21_UNK(0x21),
+    INT_3D_21_POS(0x21),
     INT_3D_22_INT(0x22),
     INT_3D_23_DATE$(0x23),
     INT_3D_24_TIME$(0x24),

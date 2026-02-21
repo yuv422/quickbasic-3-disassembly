@@ -37,6 +37,7 @@
     * [0x1E - ERL](#0x1e---erl)
     * [0x1F - ERR](#0x1f---err)
     * [0x20 - LPOS](#0x20---lpos)
+    * [0x21 - POS](#0x21---pos)
     * [0x22 - INT (integer)](#0x22---int-integer)
     * [0x23 - DATE$](#0x23---date)
     * [0x24 - TIME$](#0x24---time)
@@ -168,6 +169,10 @@
     * [0xE - READ (double)](#0xe---read-double)
     * [0xF - READ (integer)](#0xf---read-integer)
     * [0x10 - READ (string)](#0x10---read-string)
+    * [0x11 - SWAP (float)](#0x11---swap-float)
+    * [0x12 - SWAP (double)](#0x12---swap-double)
+    * [0x13 - SWAP (integer)](#0x13---swap-integer)
+    * [0x14 - SWAP (string)](#0x14---swap-string)
     * [0x15 - VARPTR$ float](#0x15---varptr-float)
     * [0x16 - VARPTR$ double](#0x16---varptr-double)
     * [0x17 - VARPTR$ integer](#0x17---varptr-integer)
@@ -283,6 +288,7 @@
     * [0xA1 - compare float to temp var](#0xa1---compare-float-to-temp-var)
     * [0xA2 - compare double to temp var](#0xa2---compare-double-to-temp-var)
     * [0xA5 - Compare tmpVarFloat and stack float value](#0xa5---compare-tmpvarfloat-and-stack-float-value)
+    * [0xA6 - Compare tmpVarDouble and stack double value](#0xa6---compare-tmpvardouble-and-stack-double-value)
     * [0xA7 - compare float with zero](#0xa7---compare-float-with-zero)
     * [0xA8 - compare double with zero](#0xa8---compare-double-with-zero)
     * [0xA9 - compare tmpVarFloat with zero](#0xa9---compare-tmpvarfloat-with-zero)
@@ -632,6 +638,19 @@ Input:
 Return:
 
     BX - position integer value
+
+### 0x21 - POS
+Current Cursor Column Position
+`y = POS(n)`
+n - dummy value. Can be any numeric integer value
+
+Input:
+
+    BX - n - integer value
+
+Return:
+
+    BX - integer value
 
 ### 0x22 - INT (integer)
 Returns the integer portion of a numeric expression. Result stored in internal integer.
@@ -1667,6 +1686,42 @@ Input:
 
     DX - pointer to destination string
 
+### 0x11 - SWAP (float)
+Exchange the Values of Two Variables
+`SWAP var1,var2`
+
+Input:
+
+    DI - var1 - pointer to float
+    SI - var2 - pointer to float
+
+### 0x12 - SWAP (double)
+Exchange the Values of Two Variables
+`SWAP var1,var2`
+
+Input:
+
+    DI - var1 - pointer to double
+    SI - var2 - pointer to double
+
+### 0x13 - SWAP (integer)
+Exchange the Values of Two Variables
+`SWAP var1,var2`
+
+Input:
+
+    DI - var1 - pointer to integer
+    SI - var2 - pointer to integer
+
+### 0x14 - SWAP (string)
+Exchange the Values of Two Variables
+`SWAP var1,var2`
+
+Input:
+
+    DI - var1 - pointer to string
+    SI - var2 - pointer to string
+
 ### 0x15 - VARPTR$ float
 Offset of Variable, in Character Form
 
@@ -2557,6 +2612,7 @@ Compare double to temp var
 Input:
 
     DI - double - pointer to double to compare with temp var
+
 ### 0xA5 - Compare tmpVarFloat and stack float value
 
 ```basic
@@ -2581,6 +2637,8 @@ IF c% = POINT(1) THEN
        1000:00a5 74  03           JZ         LAB_1000_00aa
        1000:00a7 e9  0c  00       JMP        LAB_1000_00b6
 ```
+
+### 0xA6 - Compare tmpVarDouble and stack double value
 
 ### 0xA7 - compare float with zero
 Compare float variable with zero and set zero flag accordingly
