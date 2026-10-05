@@ -9,6 +9,7 @@
   * [INP](#inp)
   * [Temp variables](#temp-variables)
   * [BASIC Compiled interrupt functions](#basic-compiled-interrupt-functions)
+  * [BSAVE format](#bsave-format)
   * [0x3d Interrupt](#0x3d-interrupt)
     * [0x1 - FIX (float)](#0x1---fix-float)
     * [0x2 - FIX (double)](#0x2---fix-double)
@@ -24,7 +25,9 @@
     * [0xD - SPACE$](#0xd---space)
     * [0xE - STRING$ (m.n)](#0xe---string-mn)
     * [0xF - STRING$ (m,string)](#0xf---string-mstring)
+    * [0x10 - ???](#0x10---)
     * [0x11 - STR$](#0x11---str)
+    * [0x12 - ???](#0x12---)
     * [0x13 - VAL](#0x13---val)
     * [0x14 - HEX$ (integer)](#0x14---hex-integer)
     * [0x15 - HEX$ (float)](#0x15---hex-float)
@@ -42,8 +45,11 @@
     * [0x23 - DATE$](#0x23---date)
     * [0x24 - TIME$](#0x24---time)
     * [0x25 - CSRLIN](#0x25---csrlin)
+    * [0x26 - ????](#0x26---)
     * [0x27 - POINT (x, y)](#0x27---point-x-y)
+    * [0x28 - POINT (x, y) Float](#0x28---point-x-y-float)
     * [0x2A - POINT value](#0x2a---point-value)
+    * [0x2B - ????](#0x2b---)
     * [0x2D - STICK](#0x2d---stick)
     * [0x2E - STRIG](#0x2e---strig)
     * [0x2F - EOF](#0x2f---eof)
@@ -67,6 +73,7 @@
     * [0x41 - SQR (double)](#0x41---sqr-double)
     * [0x42 - TAN (double)](#0x42---tan-double)
     * [0x43 - TIMER](#0x43---timer)
+    * [0x44 - ????](#0x44---)
     * [0x45 - IOCTL$](#0x45---ioctl)
     * [0x46 - ENVIRON$ (name)](#0x46---environ-name)
     * [0x47 - ENVIRON$ (ordinal)](#0x47---environ-ordinal)
@@ -80,6 +87,7 @@
   * [0x3e Interrupt](#0x3e-interrupt)
     * [0x1 - END](#0x1---end)
     * [0x2 - (END PROGRAM)](#0x2---end-program)
+    * [0x4 - ????](#0x4---)
     * [0x7 - WRITE to device start](#0x7---write-to-device-start)
     * [0x8 - RANDOMIZE (no args)](#0x8---randomize-no-args)
     * [0x9 - RANDOMIZE](#0x9---randomize)
@@ -90,6 +98,7 @@
     * [0x13 - RESUME](#0x13---resume)
     * [0x14 - DEF SEG (default)](#0x14---def-seg-default)
     * [0x15 - DEF SEG](#0x15---def-seg)
+    * [0x16 - RESET](#0x16---reset)
     * [0x17 - DATE$ (write)](#0x17---date-write)
     * [0x18 - TIME$ (write)](#0x18---time-write)
     * [0x19 - BLOAD (offset from file)](#0x19---bload-offset-from-file)
@@ -121,6 +130,7 @@
     * [0x42 - LOCATE arg](#0x42---locate-arg)
     * [0x43 - LOCATE arg not supplied](#0x43---locate-arg-not-supplied)
     * [0x44 - LOCATE](#0x44---locate)
+    * [0x48 - ????](#0x48---)
     * [0x4A - PALETTE](#0x4a---palette)
     * [0x51 - PLAY](#0x51---play)
     * [0x52 - PLAY ON](#0x52---play-on)
@@ -134,6 +144,7 @@
     * [0x5D - STRIG OFF](#0x5d---strig-off)
     * [0x5E - SOUND](#0x5e---sound)
     * [0x5F - SOUND (finished?)](#0x5f---sound-finished)
+    * [0x62 - ???](#0x62---)
     * [0x64 - COM(n) ON](#0x64---comn-on)
     * [0x65 - COM(n) OFF](#0x65---comn-off)
     * [0x66 - COM(n) STOP](#0x66---comn-stop)
@@ -219,6 +230,7 @@
     * [0x55 - concatenate strings](#0x55---concatenate-strings)
     * [0x56 - store int as double in temp var](#0x56---store-int-as-double-in-temp-var)
     * [0x57 - store int as float in temp var](#0x57---store-int-as-float-in-temp-var)
+    * [0x59 - DEBUG??](#0x59---debug)
     * [0x5B - LSET](#0x5b---lset)
     * [0x5C - MID$ statement](#0x5c---mid-statement)
     * [0x5E - ON GOTO](#0x5e---on-goto)
@@ -239,6 +251,7 @@
     * [0x6D - PRINT (integer) newline](#0x6d---print-integer-newline)
     * [0x6E - PRINT (string) newline](#0x6e---print-string-newline)
     * [0x6F - PUSH float](#0x6f---push-float)
+    * [0x70 - PUSH double](#0x70---push-double)
     * [0x71 - Push float temp var onto stack (3 param)](#0x71---push-float-temp-var-onto-stack-3-param)
     * [0x72 - Push double temp var onto stack (3 param)](#0x72---push-double-temp-var-onto-stack-3-param)
     * [0x74 - ?? convert float temp var to double temp var](#0x74----convert-float-temp-var-to-double-temp-var)
@@ -396,6 +409,21 @@ This sets the screen into mode 7 which is 320x200 16 colors
 
 Basic code starts at 1000:40 in the EXE. (assuming a base segment of 1000)
 
+## BSAVE format
+Basic can save and load chunks of memory from files. The format of the save file is as follows
+
+It uses little endian format.
+
+```
+00 byte - `0xFD` magic value
+01 word - memory segment???
+03 word - memory offset
+05 word - length of data in bytes
+07 data
+...
+byte - `0x1A` end of file marker byte  
+```
+
 ## 0x3d Interrupt
 
 ### 0x1 - FIX (float)
@@ -479,6 +507,10 @@ Input:
     CX - length - integer value length = 0x7ffff when not supplied
     DX - n - integer value. Offset in string to start copying from.
 
+Return:
+
+    BX - pointer to output string
+
 ### 0xB - LEFT$
 Substring at Left. Left most n chars.
 `s$ = LEFT$(stringexpr,n)`
@@ -488,6 +520,10 @@ Input:
     BX - stringexpr - pointer to string
     DX - n - integer value
 
+Return:
+
+    BX - pointer to output string
+
 ### 0xC - RIGHT$
 Substring at Right. Right most n chars.
 `s$ = RIGHT$(stringexpr,n)`
@@ -496,6 +532,10 @@ Input:
 
     BX - stringexpr - pointer to string
     DX - n - integer value
+
+Return:
+
+    BX - pointer to output string
 
 ### 0xD - SPACE$
 String of n Spaces
@@ -535,6 +575,9 @@ Return:
 
     BX - string - pointer to string
 
+### 0x10 - ???
+What is this???
+
 ### 0x11 - STR$
 String Representation of Numeric Expression
 
@@ -545,6 +588,9 @@ Input:
 Return:
 
     BX - pointer to string
+
+### 0x12 - ???
+What is this???
 
 ### 0x13 - VAL
 convert string into double. result stored as double temp var
@@ -680,6 +726,10 @@ Return:
 
     BX - linPos - integer value
 
+### 0x26 - ????
+what is this ????
+
+
 ### 0x27 - POINT (x, y)
 Get Attribute for point on screen
 
@@ -687,6 +737,18 @@ Input:
 
     BX - x - integer value
     DX - y - integer value
+
+Return:
+
+    BX - attribute - integer value
+
+### 0x28 - POINT (x, y) Float
+Get Attribute for point on screen
+
+Input:
+
+    BX - x - float value
+    DX - y - float value
 
 Return:
 
@@ -706,6 +768,11 @@ Input:
         n = 3 the current world y coordinate, if WINDOW is
               active; otherwise, the current physical y coordinate.
     DX - unknown - seems to be set to the integer value 0x7fff
+
+### 0x2B - ????
+what is this ????
+
+
 ### 0x2D - STICK
 return Joystick Coordinates
 `y = STICK(n)`
@@ -803,6 +870,7 @@ Return next random number into temp var as float
 Calculate arctangent and store internally. Result stored in temp var as float.
 
 Input:
+
     BX - angle in radians - pointer to float
 
 ### 0x36 - COS
@@ -825,30 +893,35 @@ Input:
 Calculate natural logarithm and store internally. Result stored in temp var as float.
 
 Input:
+
     BX - numexpr - pointer to float
 
 ### 0x39 - SIN
 Calculate sine and store internally. Result stored in temp var as float.
 
 Input:
+
     BX - angle in radians - pointer to float
 
 ### 0x3A - SQR
 Calculate square root and store internally. Result stored in temp var as float.
 
 Input:
+
     BX - numexpr - pointer to float
 
 ### 0x3B - TAN
 Calculate tangent and store internally. Result stored in temp var as float.
 
 Input:
+
     BX - angle in radians - pointer to float
 
 ### 0x3C - ATN (double)
 Calculate arctangent and store internally. Result stored in temp var as double.
 
 Input:
+
     BX - angle in radians - pointer to double
 
 ### 0x3D - COS (double)
@@ -871,28 +944,35 @@ Input:
 Calculate natural logarithm and store internally. Result stored in temp var as double.
 
 Input:
+
     BX - numexpr - pointer to double
 
 ### 0x40 - SIN (double)
 Calculate sine and store internally. Result stored in temp var as double.
 
 Input:
+
     BX - angle in radians - pointer to double
 
 ### 0x41 - SQR (double)
 Calculate square root and store internally. Result stored in temp var as double.
 
 Input:
+
     BX - numexpr - pointer to double
 
 ### 0x42 - TAN (double)
 Calculate tangent and store internally. Result stored in temp var as double.
 
 Input:
+
     BX - angle in radians - pointer to double
 
 ### 0x43 - TIMER
 Loads number of seconds since midnight into temp var DS:1A as integer value
+
+### 0x44 - ????
+what is this???
 
 ### 0x45 - IOCTL$
 Read Control String from Device Driver
@@ -951,9 +1031,11 @@ loads command line into internal string.
 Reads a byte from memory address.
 
 Input:
+
     BX - address - pointer to float containing memory address to read from
 
 Result:
+
     BX - byte read from memory (0 - 255)
 
 ### 0x63 - FRE (string)
@@ -963,6 +1045,7 @@ This instruction will cleanup unused strings int the string data space.
 Available free memory (in bytes) pushed to stack as a float
 
 Input:
+
     BX - string - pointer to string
 
 ### 0x64 - FRE (num)
@@ -997,6 +1080,9 @@ Terminate Program
 
 ### 0x2 - (END PROGRAM)
 Found at the end of the program. Clean up and exit to DOS
+
+### 0x4 - ????
+what is this ???
 
 ### 0x7 - WRITE to device start
 Start writing to file.
@@ -1055,6 +1141,9 @@ Specifies the segment address from which arguments to BLOAD, BSAVE,
 CALL ABSOLUTE, PEEK, and POKE will be offset.
 
 Argument is passed on the stack. As a float.
+
+### 0x16 - RESET
+TODO add description
 
 ### 0x17 - DATE$ (write)
 Set the system date
@@ -1219,7 +1308,9 @@ Input:
 ### 0x32 - CLS 
 Clear screen
 
-Input: BX
+Input: 
+
+    BX - arg - integer value -1 not supplied.
 
 ### 0x33 - Add argument to COLOR command
 
@@ -1242,6 +1333,7 @@ eg. `DRAW "R10 D10 R20"`
 Input:
 
     BX - drawInstructions - string pointer to draw instructions
+
 ### 0x3A - GET (gfx)
 Read pixels from screen into an array.
 
@@ -1264,6 +1356,7 @@ eg.
 Input:
 
     BX - pointer array to store graphics
+    DX - size or array required? maybe?
 
 ### 0x3B - STEP ??
 Seems to indicate the STEP instruction in a line statement.
@@ -1300,6 +1393,9 @@ LOCATE command. This also contains the last command argument
 Input:
 
     BX - arg - integer value
+
+### 0x48 - ????
+what is this???
 
 ### 0x4A - PALETTE
 Change Color in the Palette
@@ -1397,6 +1493,9 @@ Seems to be called immediately after `SOUND` opcode. Maybe queuing sound?
 
 `BX` and `DX` both seem to be set to `0xFFFF`
 
+### 0x62 - ???
+what is this???
+
 ### 0x64 - COM(n) ON
 Enable COM port n
 
@@ -1493,6 +1592,7 @@ Input:
 Change working directory
 
 Input:
+
     BX - pathspec - pointer to string path (max 128 characters)
 
 ### 0x84 - LINE (start position)
@@ -2113,6 +2213,9 @@ Input:
 
     BX - integer value
 
+### 0x59 - DEBUG??
+Seems to be included before each basic command. Maybe used for stepping
+
 ### 0x5B - LSET
 Move string into random access FIELD variable. Left justified.
 
@@ -2277,6 +2380,13 @@ Push float onto stack.
 Input:
 
     SI - pointer to float value
+
+### 0x70 - PUSH double
+Push double onto stack.
+
+Input:
+
+    SI - pointer to double value
 
 ### 0x71 - Push float temp var onto stack (3 param)
 Pushes the current value of float temp var onto a stack.
