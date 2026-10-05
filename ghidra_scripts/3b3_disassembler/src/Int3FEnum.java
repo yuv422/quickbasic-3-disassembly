@@ -1,7 +1,7 @@
 import java.util.List;
 
 public enum Int3FEnum {
-    I3F_1_FIX(0x1),
+    I3F_1_UNK(0x1),
     I3F_2_ON_ERROR(0x2),
     I3F_3_UNK(0x3),
     I3F_4_ON_KEY(0x4),
@@ -112,7 +112,7 @@ public enum Int3FEnum {
     I3F_6D_PRINT_INT_NL(0x6d),
     I3F_6E_PRINT_STR_NL(0x6e, new FuncSignature(List.of(Arg.bxString("str")))),
     I3F_6F_PUSH_FLOAT(0x6f),
-    I3F_70_UNK(0x70),
+    I3F_70_PUSH_DOUBLE(0x70),
     I3F_71_PUSH_TMP_VAR_FLOAT_TO_STACK(0x71, 2),
     I3F_72_PUSH_TMP_VAR_DOUBLE_TO_STACK(0x72, 2),
     I3F_73_LOAD_FLOAT_TO_DOUBLE_TEMP_VAR(0x73),

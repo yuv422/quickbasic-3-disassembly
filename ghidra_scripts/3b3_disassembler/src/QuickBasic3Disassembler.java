@@ -27,6 +27,8 @@ import static ghidra.app.cmd.comments.SetCommentCmd.createComment;
 public class QuickBasic3Disassembler extends GhidraScript {
     DataType byteDataType;
     DataType wordDataType;
+    Boolean flagOptimiseSpeed = false;
+    int speedPadding = 0;
 
     @Override
     protected void run() throws Exception {
@@ -41,7 +43,15 @@ public class QuickBasic3Disassembler extends GhidraScript {
         Address currentAddr = currentProgram.getMemory().getMinAddress().add(0x40);
         createBrun30Segments(currentAddr);
 
+        int flags = Byte.toUnsignedInt(currentProgram.getMemory().getByte(currentAddr.subtract(1)));
+        if ((flags & 0x40) != 0) {
+            flagOptimiseSpeed = true;
+            speedPadding = 2;
+        }
+
         printf("min address = %s %s\n", currentAddr.toString(), byteDataType.getDataTypePath());
+        printf("optimise for speed: %s\n", flagOptimiseSpeed.toString());
+
         if (getInstructionAt(currentAddr) != null) {
             currentAddr = currentAddress;
         }
@@ -135,6 +145,7 @@ public class QuickBasic3Disassembler extends GhidraScript {
     }
 
     Address handleOnGoto(Disassembler disassembler, Address commandByteAddress) throws MemoryAccessException, CodeUnitInsertionException {
+        printf("GOTO!!!\n\n");
         int numAddrs = Byte.toUnsignedInt(currentProgram.getMemory().getByte(commandByteAddress.add(1)));
         Address jumpTableAddr = commandByteAddress.add(2);
         for (int i = 0; i < numAddrs; i++) {
@@ -155,17 +166,17 @@ public class QuickBasic3Disassembler extends GhidraScript {
 
     int getNumCommandBytes(int intCode, int commandByte, Address commandByteAddress) throws MemoryAccessException {
         switch (intCode) {
-            case 0x3d : return Int3DEnum.findByCmd(commandByte).cmdLength;
-            case 0x3e : return Int3EEnum.findByCmd(commandByte).cmdLength;
+            case 0x3d : return Int3DEnum.findByCmd(commandByte).cmdLength + speedPadding;
+            case 0x3e : return Int3EEnum.findByCmd(commandByte).cmdLength + speedPadding;
             case 0x3f : {
                 if (commandByte == 0xb7) {
-                    int numArgs = Byte.toUnsignedInt(currentProgram.getMemory().getByte(commandByteAddress.add(1)));
-                    return numArgs + 2;
+                    int numArgs = Byte.toUnsignedInt(currentProgram.getMemory().getByte(commandByteAddress.add(1 + speedPadding)));
+                    return numArgs + 2 + speedPadding;
                 }
-                return Int3FEnum.findByCmd(commandByte).cmdLength;
+                return Int3FEnum.findByCmd(commandByte).cmdLength + speedPadding;
             }
         }
-        return 1;
+        return 1 + speedPadding;
     }
 
     String getCommandString(int intCode, int commandByte) {

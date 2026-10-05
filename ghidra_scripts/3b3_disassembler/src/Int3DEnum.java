@@ -41,7 +41,7 @@ public enum Int3DEnum {
     INT_3D_25_CSRLIN(0x25),
     INT_3D_26_UNK(0x26),
     INT_3D_27_POINT_ATTR(0x27),
-    INT_3D_28_UNK(0x28),
+    INT_3D_28_POINT_ATTR_FLOAT(0x28),
     INT_3D_29_UNK(0x29),
     INT_3D_2A_POINT_VAL(0x2a),
     INT_3D_2B_UNK(0x2b),
