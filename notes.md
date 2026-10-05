@@ -144,7 +144,7 @@
     * [0x2F - CIRCLE (start angle)](#0x2f---circle-start-angle)
     * [0x30 - CIRCLE (end angle)](#0x30---circle-end-angle)
     * [0x31 - CIRCLE (aspect ratio)](#0x31---circle-aspect-ratio)
-    * [0x32 - CLS ](#0x32---cls-)
+    * [0x32 - CLS](#0x32---cls-)
     * [0x33 - Add argument to COLOR command](#0x33---add-argument-to-color-command)
     * [0x34 - COLOR arg not supplied](#0x34---color-arg-not-supplied)
     * [0x35 - COLOR](#0x35---color)
