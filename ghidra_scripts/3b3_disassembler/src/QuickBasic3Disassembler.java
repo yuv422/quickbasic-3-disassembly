@@ -173,6 +173,10 @@ public class QuickBasic3Disassembler extends GhidraScript {
                     int numArgs = Byte.toUnsignedInt(currentProgram.getMemory().getByte(commandByteAddress.add(1 + speedPadding)));
                     return numArgs + 2 + speedPadding;
                 }
+                if (commandByte == 0x01) { // element size byte, dims*2 byte, then one word per dimension
+                    int dimBytes = Byte.toUnsignedInt(currentProgram.getMemory().getByte(commandByteAddress.add(2 + speedPadding)));
+                    return dimBytes + 3 + speedPadding;
+                }
                 return Int3FEnum.findByCmd(commandByte).cmdLength + speedPadding;
             }
         }
